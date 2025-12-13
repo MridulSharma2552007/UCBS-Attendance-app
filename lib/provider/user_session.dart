@@ -15,6 +15,10 @@ class UserSession extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setName(String value) {
+    name = value;
+  }
+
   void clear() {
     role = null;
     rollNo = null;
