@@ -1,9 +1,12 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
 
 class RoleSelection extends StatefulWidget {
-  const RoleSelection({super.key});
+  final PageController controller;
+  const RoleSelection({super.key, required this.controller});
 
   @override
   State<RoleSelection> createState() => _RoleSelectionState();
@@ -14,164 +17,246 @@ class _RoleSelectionState extends State<RoleSelection> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgDark,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 30),
-
-              // Title
-              Text(
-                'Choose Your Role',
-                style: GoogleFonts.poppins(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              Text(
-                "Select how you want to continue.\nYour experience will be customized based on your role.",
-                style: GoogleFonts.poppins(
-                  fontSize: 15,
-                  color: AppColors.textSecondary,
-                  height: 1.4,
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
-              // TEACHER CARD
-              RoleSelectionContainer(
-                role: 'Teacher',
-                subtitle:
-                    "• Manage class attendance instantly\n"
-                    "• View student performance analytics\n"
-                    "• Create announcements & control sessions",
-                icon: Icons.school_rounded,
-                color: AppColors.accentBlue,
-                ontap: () {},
-              ),
-
-              // STUDENT CARD
-              RoleSelectionContainer(
-                role: 'Student',
-                subtitle:
-                    "• Mark attendance using face recognition\n"
-                    "• Track daily & monthly attendance\n"
-                    "• Receive important class updates",
-                icon: Icons.person_rounded,
-                color: AppColors.accentPurple,
-                ontap: () {},
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class RoleSelectionContainer extends StatefulWidget {
-  final VoidCallback ontap;
-  final String role;
-  final String subtitle;
-  final IconData icon;
-  final Color color;
-
-  const RoleSelectionContainer({
-    super.key,
-    required this.role,
-    required this.subtitle,
-    required this.icon,
-    required this.color,
-    required this.ontap,
-  });
-
-  @override
-  State<RoleSelectionContainer> createState() => _RoleSelectionContainerState();
-}
-
-class _RoleSelectionContainerState extends State<RoleSelectionContainer> {
-  bool _pressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 180),
-      curve: Curves.easeOut,
-      margin: const EdgeInsets.only(bottom: 22),
-      child: GestureDetector(
-        onTapDown: (_) => setState(() => _pressed = true),
-        onTapUp: (_) => setState(() => _pressed = false),
-        onTapCancel: () => setState(() => _pressed = false),
-        onTap: widget.ontap,
-        child: AnimatedContainer(
-          duration: Duration(milliseconds: 200),
-          transform: Matrix4.identity()..scaleAdjoint(_pressed ? 0.97 : 1.0),
-          height: 190,
-          decoration: BoxDecoration(
-            color: widget.color.withValues(alpha: 0.10),
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(
-              color: widget.color.withValues(alpha: 0.5),
-              width: 1.5,
+      body: Stack(
+        children: [
+          Positioned(
+            top: -10,
+            right: -10,
+            child: SvgPicture.asset(
+              'assets/images/Shape 1.svg',
+              width: 120,
+              height: 120,
+              color: Colors.deepOrange.withOpacity(0.7),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: widget.color.withValues(alpha: 0.15),
-                blurRadius: 20,
-                offset: Offset(0, 6),
-              ),
-            ],
           ),
-          child: Row(
-            children: [
-              Container(
-                width: 120,
-                decoration: BoxDecoration(
-                  color: widget.color.withValues(alpha: 0.25),
-                  borderRadius: const BorderRadius.horizontal(
-                    left: Radius.circular(30),
-                  ),
-                ),
-                child: Icon(widget.icon, size: 60, color: Colors.white),
-              ),
+          Positioned(
+            top: 650,
+            right: -20,
+            child: SvgPicture.asset(
+              'assets/images/Shape 5.svg',
+              width: 120,
+              height: 120,
+              color: Colors.deepOrange.withOpacity(0.7),
+            ),
+          ),
+          Positioned(
+            top: 80,
+            left: -15,
+            child: SvgPicture.asset(
+              'assets/images/Shape 15.svg',
+              width: 130,
+              height: 130,
+              color: Colors.deepOrange.withOpacity(0.7),
+            ),
+          ),
+          Positioned(
+            top: 450,
+            left: -20,
+            child: SvgPicture.asset(
+              'assets/images/Shape 2.svg',
+              width: 130,
+              height: 130,
+              color: Colors.deepOrange.withOpacity(0.7),
+            ),
+          ),
 
-              // Text Area
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
+          Positioned(
+            top: 140,
+            left: 20,
+            right: 20,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                child: Container(
+                  height: 600,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.10),
+                    borderRadius: BorderRadius.circular(25),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.2),
+                      width: 1,
+                    ),
+                  ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      SizedBox(height: 30),
                       Text(
-                        widget.role,
-                        style: GoogleFonts.poppins(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
+                        'Welcome To FaceMark',
+                        style: GoogleFonts.dmSans(
                           color: AppColors.textPrimary,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      SizedBox(height: 10),
                       Text(
-                        widget.subtitle,
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
+                        'Ai attendance system for UCBS',
+                        style: GoogleFonts.dmSans(
                           color: AppColors.textSecondary,
-                          height: 1.35,
+                          fontSize: 15,
                         ),
+                      ),
+                      SizedBox(height: 50),
+                      Text(
+                        'Select your Role',
+                        style: GoogleFonts.dmSans(
+                          color: AppColors.textPrimary,
+                          fontSize: 18,
+                        ),
+                      ),
+                      SizedBox(height: 50),
+                      ChoiceContainer(
+                        roll: 'Teacher',
+                        description: 'Manage attendance \nreports',
+                        color: AppColors.accentBlue,
+                        ontap: () {
+                          widget.controller.animateToPage(
+                            1,
+                            duration: Duration(milliseconds: 350),
+                            curve: Curves.easeIn,
+                          );
+                        },
+                        icon: Icons.account_box,
+                      ),
+                      SizedBox(height: 20),
+                      ChoiceContainer(
+                        roll: 'Student',
+                        description: 'Mark attendance \nview progress',
+                        color: AppColors.accentPurple,
+                        ontap: () {
+                          widget.controller.animateToPage(
+                            1,
+                            duration: Duration(milliseconds: 350),
+                            curve: Curves.easeIn,
+                          );
+                        },
+                        icon: Icons.keyboard_command_key_outlined,
                       ),
                     ],
                   ),
                 ),
               ),
-            ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ChoiceContainer extends StatefulWidget {
+  final String roll;
+  final String description;
+  final Color color;
+  final VoidCallback ontap;
+  final IconData icon;
+
+  const ChoiceContainer({
+    super.key,
+    required this.roll,
+    required this.description,
+    required this.color,
+    required this.ontap,
+    required this.icon,
+  });
+
+  @override
+  State<ChoiceContainer> createState() => _ChoiceContainerState();
+}
+
+class _ChoiceContainerState extends State<ChoiceContainer> {
+  double _scale = 1.0;
+  void _onTapDown(TapDownDetails details) {
+    setState(() {
+      _scale = 0.95; 
+    });
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    setState(() {
+      _scale = 1.0; 
+    });
+
+    widget.ontap(); 
+  }
+
+  void _onTapCancel() {
+    setState(() {
+      _scale = 1.0;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: GestureDetector(
+        onTap: widget.ontap,
+        onTapDown: _onTapDown, // when finger touches
+        onTapUp: _onTapUp, // when finger lifts
+        onTapCancel: _onTapCancel, // if tap cancelled
+
+        child: AnimatedScale(
+          scale: _scale,
+          duration: Duration(milliseconds: 120),
+          curve: Curves.easeOut,
+          child: Container(
+            height: 150,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: widget.color.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: widget.color),
+              boxShadow: [
+                BoxShadow(
+                  color: widget.color.withOpacity(0.2),
+                  blurRadius: 15,
+                  offset: Offset(0, 5),
+                ),
+              ],
+            ),
+
+            child: Row(
+              children: [
+                SizedBox(width: 20),
+                Container(
+                  height: 100,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: widget.color.withValues(alpha: 0.4),
+                    border: Border.all(
+                      color: widget.color.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Center(child: Icon(widget.icon, size: 50)),
+                ),
+                SizedBox(width: 25),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 20),
+                    Text(
+                      widget.roll,
+                      style: GoogleFonts.dmSans(
+                        color: AppColors.textPrimary,
+                        fontSize: 20,
+                      ),
+                    ),
+                    Text(
+                      widget.description,
+                      style: GoogleFonts.dmSans(
+                        color: AppColors.textFaded,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
