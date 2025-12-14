@@ -13,6 +13,8 @@ class StudentLogin extends StatefulWidget {
 
 class _StudentLoginState extends State<StudentLogin> {
   double opacity = 0.0;
+  final TextEditingController _namecontroller = TextEditingController();
+  final TextEditingController _rollnocontroller = TextEditingController();
 
   @override
   void initState() {
@@ -20,6 +22,13 @@ class _StudentLoginState extends State<StudentLogin> {
     Future.delayed(const Duration(milliseconds: 500), () {
       setState(() => opacity = 1.0);
     });
+  }
+
+  @override
+  void dispose() {
+    _namecontroller.dispose();
+    _rollnocontroller.dispose();
+    super.dispose();
   }
 
   @override
@@ -35,7 +44,11 @@ class _StudentLoginState extends State<StudentLogin> {
 
             Align(
               alignment: Alignment.center,
-              child: FrostedStudentCard(opacity: opacity),
+              child: FrostedStudentCard(
+                opacity: opacity,
+                nameController: _namecontroller,
+                rollNoController: _rollnocontroller,
+              ),
             ),
           ],
         ),
@@ -46,8 +59,15 @@ class _StudentLoginState extends State<StudentLogin> {
 
 class FrostedStudentCard extends StatelessWidget {
   final double opacity;
+  final TextEditingController nameController;
+  final TextEditingController rollNoController;
 
-  const FrostedStudentCard({super.key, required this.opacity});
+  const FrostedStudentCard({
+    super.key,
+    required this.opacity,
+    required this.nameController,
+    required this.rollNoController,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -108,12 +128,15 @@ class FrostedStudentCard extends StatelessWidget {
                   CustomTextFields(
                     textfieldhint: 'Enter Your Name',
                     inputType: TextInputType.text,
+                    controller: nameController,
                   ),
 
                   CustomTextFields(
                     textfieldhint: 'Enter Roll Number',
                     inputType: TextInputType.number,
+                    controller: rollNoController,
                   ),
+
                   StudentDropdown(
                     label: "Choose your Sem",
                     options: ["1", "2", "3", "4", "5", "6"],
@@ -131,6 +154,7 @@ class FrostedStudentCard extends StatelessWidget {
 }
 
 class CustomTextFields extends StatelessWidget {
+  final TextEditingController controller;
   final String textfieldhint;
   final TextInputType inputType;
 
@@ -138,6 +162,7 @@ class CustomTextFields extends StatelessWidget {
     super.key,
     required this.textfieldhint,
     required this.inputType,
+    required this.controller,
   });
 
   @override
@@ -154,6 +179,7 @@ class CustomTextFields extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           child: TextField(
+            controller: controller,
             keyboardType: inputType,
             style: const TextStyle(color: Colors.white),
 
