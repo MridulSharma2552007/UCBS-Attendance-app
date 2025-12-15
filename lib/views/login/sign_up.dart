@@ -1,7 +1,9 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
 import 'package:ucbs_attendance_app/provider/user_session.dart';
 
@@ -20,7 +22,7 @@ class _SignUpState extends State<SignUp> {
     return Scaffold(
       body: Stack(
         children: [
-          /// Background
+         
           Positioned.fill(
             child: Image.asset('assets/images/bg.jpeg', fit: BoxFit.cover),
           ),
@@ -95,9 +97,7 @@ class _SignUpState extends State<SignUp> {
                   vertical: 30,
                 ),
                 child: GestureDetector(
-                  onTap: () {
-                    // TODO: Google Sign-In logic
-                  },
+                  onTap: () {},
                   child: Container(
                     height: 58,
                     decoration: BoxDecoration(
