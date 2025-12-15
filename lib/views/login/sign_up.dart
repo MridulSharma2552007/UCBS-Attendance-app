@@ -2,10 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
 import 'package:ucbs_attendance_app/methods/sign_in_with_google.dart';
 import 'package:ucbs_attendance_app/provider/user_session.dart';
+import 'package:ucbs_attendance_app/views/login/scan_screen.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -76,7 +76,7 @@ class _SignUpState extends State<SignUp> {
 
               const SizedBox(height: 35),
 
-              /// Info / Trust Text
+             
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: Column(
@@ -101,18 +101,10 @@ class _SignUpState extends State<SignUp> {
                     try {
                       final user = await googleAuth.signIn();
 
-                      if (user == null) return; // user cancelled
-
+                      if (user == null) return;
                       final session = context.read<UserSession>();
 
-                      session.setName(user.displayName ?? "User");
                       session.setEmail(user.email ?? "");
-
-                      await Supabase.instance.client.from('students').upsert({
-                        // 'uid': user.uid,
-                        // 'email': user.email,
-                        'name': user.displayName,
-                      });
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -120,10 +112,12 @@ class _SignUpState extends State<SignUp> {
                           backgroundColor: Colors.green,
                         ),
                       );
-
-                      // TODO: Navigate to role selection screen
-                      // Navigator.pushReplacement(...);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => ScanScreen()),
+                      );
                     } catch (e) {
+                      print(e);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text("Google sign-in failed"),
