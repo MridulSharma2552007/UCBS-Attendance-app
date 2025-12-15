@@ -5,6 +5,7 @@ class UserSession extends ChangeNotifier {
   String? rollNo;
   String? name;
   String? sem;
+  String? email;
   void setrole(String value) {
     role = value;
     notifyListeners();
@@ -25,9 +26,15 @@ class UserSession extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setEmail(String value) {
+    email = value;
+    notifyListeners();
+  }
+
   void clear() {
     role = null;
     rollNo = null;
+    email = null;
     notifyListeners();
   }
 }

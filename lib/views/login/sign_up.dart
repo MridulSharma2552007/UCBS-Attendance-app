@@ -1,10 +1,10 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
+import 'package:ucbs_attendance_app/methods/sign_in_with_google.dart';
 import 'package:ucbs_attendance_app/provider/user_session.dart';
 
 class SignUp extends StatefulWidget {
@@ -15,6 +15,7 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+  final googleAuth = SignInWithGoogle();
   @override
   Widget build(BuildContext context) {
     final session = context.watch<UserSession>();
@@ -22,7 +23,6 @@ class _SignUpState extends State<SignUp> {
     return Scaffold(
       body: Stack(
         children: [
-         
           Positioned.fill(
             child: Image.asset('assets/images/bg.jpeg', fit: BoxFit.cover),
           ),
@@ -97,7 +97,42 @@ class _SignUpState extends State<SignUp> {
                   vertical: 30,
                 ),
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () async {
+                    try {
+                      final user = await googleAuth.signIn();
+
+                      if (user == null) return; // user cancelled
+
+                      final session = context.read<UserSession>();
+
+                      session.setName(user.displayName ?? "User");
+                      session.setEmail(user.email ?? "");
+
+                      await Supabase.instance.client.from('students').upsert({
+                        // 'uid': user.uid,
+                        // 'email': user.email,
+                        'name': user.displayName,
+                      });
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Signed in successfully"),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+
+                      // TODO: Navigate to role selection screen
+                      // Navigator.pushReplacement(...);
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Google sign-in failed"),
+                          backgroundColor: Colors.redAccent,
+                        ),
+                      );
+                    }
+                  },
+
                   child: Container(
                     height: 58,
                     decoration: BoxDecoration(

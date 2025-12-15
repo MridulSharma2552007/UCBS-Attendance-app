@@ -12,7 +12,20 @@
           "package_name": "com.example.ucbs_attendance_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "654699958000-4pg0alel4ghb1eek8qkkgrsl2f04qkul.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ucbs_attendance_app",
+            "certificate_hash": "78de980043ab9cda9da46dcccc6cf3c80c9dba5f"
+          }
+        },
+        {
+          "client_id": "654699958000-13u9a32ai0it3ibi0ask42jp0c9t3apa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB8gCAnUJYZmaYFRCJ8-bqzlLEonGvdsiY"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "654699958000-13u9a32ai0it3ibi0ask42jp0c9t3apa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
