@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
 import 'package:ucbs_attendance_app/provider/user_session.dart';
 import 'package:ucbs_attendance_app/views/login/scan_screen.dart';
+import 'package:ucbs_attendance_app/views/login/sign_up.dart';
 
 class StudentLogin extends StatefulWidget {
   const StudentLogin({super.key});
@@ -229,7 +230,7 @@ class _FrostedStudentCardState extends State<FrostedStudentCard> {
 
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => ScanScreen()),
+                        MaterialPageRoute(builder: (context) => SignUp()),
                       );
                     },
                   ),
