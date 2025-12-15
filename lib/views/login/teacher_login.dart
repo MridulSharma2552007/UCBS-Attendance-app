@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
+import 'package:ucbs_attendance_app/views/login/sign_in_teacher.dart';
 
 class TeacherLogin extends StatefulWidget {
   const TeacherLogin({super.key});
@@ -110,13 +111,62 @@ class FrostedLogicCard extends StatelessWidget {
                     inputType: TextInputType.text,
                   ),
 
-                  /// Roll Number
+                  /// Employee Id
                   CustomTextFields(
-                    textfieldhint: 'Enter Your Roll No.',
+                    textfieldhint: 'Enter Your Employee Id',
                     inputType: TextInputType.number,
                   ),
 
-                  const SizedBox(height: 30),
+                  Container(
+                    height: 55,
+                    margin: const EdgeInsets.only(top: 12,bottom: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade400,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+
+                    child: Center(
+                      child: TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          "Submit",
+                          style: TextStyle(color: Colors.white, fontSize: 22),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    // crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Already logged in?",
+                        style: TextStyle(color: Colors.grey,fontSize: 13),
+                      ),
+                      SizedBox(width: 4),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>SignInTeacher()));
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          "Sign In",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline,
+                            decorationColor: Colors.blue,
+                            fontSize: 13
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 10),
                 ],
               ),
             ),
