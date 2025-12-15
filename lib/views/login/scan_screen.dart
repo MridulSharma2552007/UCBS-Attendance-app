@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 
 class ScanScreen extends StatefulWidget {
@@ -13,163 +16,269 @@ class ScanScreen extends StatefulWidget {
 }
 
 class _ScanScreenState extends State<ScanScreen> {
-  CameraController? cameraController;
-  bool isLoading = true;
+  CameraController? _controller;
+  bool _loading = true;
+  bool _uploading = false;
+
+  double? personConfidence;
+  bool embeddingCaptured = false;
 
   @override
   void initState() {
     super.initState();
-    initCamera();
+    _initCamera();
   }
 
-  Future<void> initCamera() async {
-    var status = await Permission.camera.request();
-    if (!status.isGranted) return;
+  Future<void> _initCamera() async {
+    final permission = await Permission.camera.request();
+    if (!permission.isGranted) return;
 
     final cameras = await availableCameras();
     final frontCamera = cameras.firstWhere(
       (c) => c.lensDirection == CameraLensDirection.front,
     );
 
-    cameraController = CameraController(
+    _controller = CameraController(
       frontCamera,
       ResolutionPreset.high,
       enableAudio: false,
     );
 
-    await cameraController!.initialize();
+    await _controller!.initialize();
     if (!mounted) return;
 
-    setState(() => isLoading = false);
+    setState(() => _loading = false);
+  }
+
+  Future<void> _sendImage(String path) async {
+    try {
+      setState(() => _uploading = true);
+
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse("https://nida-untutelar-lustrelessly.ngrok-free.dev/detect"),
+      );
+
+      request.files.add(await http.MultipartFile.fromPath('file', path));
+
+      final response = await request.send();
+      final body = await response.stream.bytesToString();
+      final decoded = jsonDecode(body);
+
+      final detections = decoded['detections'] as List;
+
+      double? conf;
+      bool hasEmbedding = false;
+
+      for (final d in detections) {
+        if (d['object'] == 'person') {
+          conf = (d['confidence'] as num).toDouble();
+          hasEmbedding = d['embedding'] != null;
+          break;
+        }
+      }
+
+      setState(() {
+        personConfidence = conf;
+        embeddingCaptured = hasEmbedding;
+        _uploading = false;
+      });
+    } catch (e) {
+      debugPrint("Upload error: $e");
+      setState(() => _uploading = false);
+    }
   }
 
   @override
   void dispose() {
-    cameraController?.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.white))
-          : Stack(
-              children: [
-                /// 🔥 Full screen camera
-                Positioned.fill(child: CameraPreview(cameraController!)),
+      body: Stack(
+        children: [
+          /// CAMERA (FULL SCREEN, NO DISTORTION)
+          Positioned.fill(child: CameraPreview(_controller!)),
 
-                /// 🔥 Frosted instruction panel with typing effect
-                Positioned(
-                  top: 50,
-                  left: 20,
-                  right: 20,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                      child: Container(
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.35),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white30),
-                        ),
-                        child: const TypingInstructionText(
-                          fullText:
-                              "⚠ FACE SCAN INSTRUCTIONS:\n\n"
-                              "• Keep your face inside the frame\n"
-                              "• Look straight into the camera\n"
-                              "• Avoid backlight for accuracy\n"
-                              "• Hold still for 1–2 seconds\n"
-                              "• AI will capture 512-D facial embedding",
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+          /// INSTRUCTION OVERLAY
+          Positioned(top: 40, left: 20, right: 20, child: InstructionCard()),
 
-                /// 🔥 Capture button (bottom)
-                Positioned(
-                  bottom: 40,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: GestureDetector(
-                      onTap: () async {
-                        HapticFeedback.mediumImpact();
-
-                        if (cameraController != null &&
-                            cameraController!.value.isInitialized) {
-                          final file = await cameraController!.takePicture();
-
-                          // TODO: send file.path to face recognition model
-                          print("Captured: ${file.path}");
-                        }
-                      },
-                      child: Container(
-                        height: 80,
-                        width: 80,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 4),
-                        ),
-                        child: Container(
-                          margin: const EdgeInsets.all(6),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+          /// CONFIDENCE RESULT
+          if (personConfidence != null)
+            Positioned(
+              bottom: 140,
+              left: 20,
+              right: 20,
+              child: ResultCard(
+                confidence: personConfidence!,
+                hasEmbedding: embeddingCaptured,
+              ),
             ),
+
+          /// CAPTURE BUTTON
+          Positioned(
+            bottom: 40,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: GestureDetector(
+                onTap: () async {
+                  HapticFeedback.mediumImpact();
+
+                  if (_controller!.value.isInitialized) {
+                    final file = await _controller!.takePicture();
+                    await _sendImage(file.path);
+                  }
+                },
+                child: Container(
+                  height: 80,
+                  width: 80,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 4),
+                  ),
+                  child: Container(
+                    margin: const EdgeInsets.all(6),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          /// UPLOADING LOADER
+          if (_uploading)
+            const Center(child: CircularProgressIndicator(color: Colors.white)),
+        ],
+      ),
     );
   }
 }
 
-/// ===============================================================
-///  🔥 TYPING INSTRUCTION TEXT WIDGET (With vibration each letter)
-/// ===============================================================
+/// ================= INSTRUCTION CARD =================
 
-class TypingInstructionText extends StatefulWidget {
-  final String fullText;
-  final Duration speed;
+class InstructionCard extends StatelessWidget {
+  const InstructionCard({super.key});
 
-  const TypingInstructionText({
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.4),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: Colors.white24),
+          ),
+          child: const TypingText(
+            text:
+                "⚠ FACE SCAN INSTRUCTIONS\n\n"
+                "• Keep your face inside the frame\n"
+                "• Look straight at the camera\n"
+                "• Avoid backlight\n"
+                "• Hold still for 1–2 seconds\n"
+                "• AI captures 512-D facial vector",
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// ================= RESULT CARD =================
+
+class ResultCard extends StatelessWidget {
+  final double confidence;
+  final bool hasEmbedding;
+
+  const ResultCard({
     super.key,
-    required this.fullText,
-    this.speed = const Duration(milliseconds: 35),
+    required this.confidence,
+    required this.hasEmbedding,
   });
 
   @override
-  State<TypingInstructionText> createState() => _TypingInstructionTextState();
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.45),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white24),
+          ),
+          child: Column(
+            children: [
+              Text(
+                "Person confidence: ${(confidence * 100).toStringAsFixed(2)}%",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                hasEmbedding
+                    ? "✔ Face embedding captured (512-D)"
+                    : "⚠ Face not clear enough",
+                style: TextStyle(
+                  color: hasEmbedding
+                      ? Colors.greenAccent
+                      : Colors.orangeAccent,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _TypingInstructionTextState extends State<TypingInstructionText> {
-  String displayedText = "";
+/// ================= TYPING TEXT =================
+
+class TypingText extends StatefulWidget {
+  final String text;
+
+  const TypingText({super.key, required this.text});
+
+  @override
+  State<TypingText> createState() => _TypingTextState();
+}
+
+class _TypingTextState extends State<TypingText> {
+  String current = "";
   int index = 0;
   Timer? timer;
 
   @override
   void initState() {
     super.initState();
-    startTyping();
-  }
-
-  void startTyping() {
-    timer = Timer.periodic(widget.speed, (t) {
-      if (index < widget.fullText.length) {
-        setState(() {
-          displayedText += widget.fullText[index];
-        });
-
-        HapticFeedback.selectionClick(); // 🔥 vibrate per character
-
+    timer = Timer.periodic(const Duration(milliseconds: 35), (t) {
+      if (index < widget.text.length) {
+        setState(() => current += widget.text[index]);
+        HapticFeedback.selectionClick();
         index++;
       } else {
         t.cancel();
@@ -186,8 +295,8 @@ class _TypingInstructionTextState extends State<TypingInstructionText> {
   @override
   Widget build(BuildContext context) {
     return Text(
-      displayedText,
-      style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.4),
+      current,
+      style: const TextStyle(color: Colors.white, height: 1.4),
     );
   }
 }
