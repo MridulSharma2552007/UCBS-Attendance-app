@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "654699958000",
+    "project_id": "ucbs-attendance-system-4cec1",
+    "storage_bucket": "ucbs-attendance-system-4cec1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:654699958000:android:3aeeec15c846e88568fc35",
+        "android_client_info": {
+          "package_name": "com.example.ucbs_attendance_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8gCAnUJYZmaYFRCJ8-bqzlLEonGvdsiY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

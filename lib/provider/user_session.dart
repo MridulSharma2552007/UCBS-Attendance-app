@@ -17,10 +17,12 @@ class UserSession extends ChangeNotifier {
 
   void setName(String value) {
     name = value;
+    notifyListeners();
   }
 
   void setSem(String value) {
     sem = value;
+    notifyListeners();
   }
 
   void clear() {
