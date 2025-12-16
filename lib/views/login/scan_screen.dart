@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+import 'package:ucbs_attendance_app/provider/user_session.dart';
+import 'package:ucbs_attendance_app/views/main/home.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -51,6 +54,7 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   Future<void> _sendImage(String path) async {
+    final userdata = context.read<UserSession>();
     try {
       setState(() => _uploading = true);
 
@@ -83,6 +87,18 @@ class _ScanScreenState extends State<ScanScreen> {
         embeddingCaptured = hasEmbedding;
         _uploading = false;
       });
+      if (userdata.role == "Student") {
+        
+      }
+      if (personConfidence != null && personConfidence! > 0.50) {
+        if (!mounted) return;
+        Future.delayed(Duration(seconds: 4), () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => Home()),
+          );
+        });
+      }
     } catch (e) {
       debugPrint("Upload error: $e");
       setState(() => _uploading = false);
@@ -275,7 +291,7 @@ class _TypingTextState extends State<TypingText> {
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(const Duration(milliseconds: 35), (t) {
+    timer = Timer.periodic(const Duration(milliseconds: 20), (t) {
       if (index < widget.text.length) {
         setState(() => current += widget.text[index]);
         HapticFeedback.selectionClick();
