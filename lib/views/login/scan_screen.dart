@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:ucbs_attendance_app/methods/supabase/verified_student.dart';
 import 'package:ucbs_attendance_app/provider/user_session.dart';
 import 'package:ucbs_attendance_app/views/main/home.dart';
 
@@ -55,6 +56,7 @@ class _ScanScreenState extends State<ScanScreen> {
 
   Future<void> _sendImage(String path) async {
     final userdata = context.read<UserSession>();
+    List<double>? faceVector;
     try {
       setState(() => _uploading = true);
 
@@ -77,28 +79,50 @@ class _ScanScreenState extends State<ScanScreen> {
       for (final d in detections) {
         if (d['object'] == 'person') {
           conf = (d['confidence'] as num).toDouble();
-          hasEmbedding = d['embedding'] != null;
+
+          if (d['embedding'] != null) {
+            faceVector = List<double>.from(d['embedding']);
+            hasEmbedding = true;
+          }
+
           break;
         }
       }
 
+      // ✅ Save result
       setState(() {
         personConfidence = conf;
         embeddingCaptured = hasEmbedding;
         _uploading = false;
       });
+
+      // ✅ STOP if face not good enough
+      if (conf == null || conf < 0.50 || !hasEmbedding || faceVector == null) {
+        debugPrint("Face not valid for attendance");
+        return;
+      }
+
+      // ✅ Push to Supabase (Student only)
       if (userdata.role == "Student") {
-        
+        await VerifiedStudent().pushStudentData(
+          email: userdata.email!,
+          name: userdata.name!,
+          rollNo: userdata.rollNo!,
+          sem: userdata.sem!,
+          vector: faceVector,
+          confidence: conf,
+        );
       }
-      if (personConfidence != null && personConfidence! > 0.50) {
-        if (!mounted) return;
-        Future.delayed(Duration(seconds: 4), () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => Home()),
-          );
-        });
-      }
+
+      // ✅ Navigate SAFELY
+      if (!mounted) return;
+
+      await Future.delayed(const Duration(seconds: 2));
+      _controller?.dispose();
+
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const Home()));
     } catch (e) {
       debugPrint("Upload error: $e");
       setState(() => _uploading = false);
