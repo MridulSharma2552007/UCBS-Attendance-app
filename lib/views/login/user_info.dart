@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
 import 'package:ucbs_attendance_app/provider/user_session.dart';
 import 'package:ucbs_attendance_app/views/login/student_login.dart';
-import 'package:ucbs_attendance_app/views/login/teacher_login.dart';
+import 'package:ucbs_attendance_app/views/login/teacher_signup.dart';
 
 class UserInfo extends StatefulWidget {
   const UserInfo({super.key});
