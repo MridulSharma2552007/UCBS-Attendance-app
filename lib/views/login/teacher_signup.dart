@@ -4,7 +4,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
+import 'package:ucbs_attendance_app/provider/user_session.dart';
+import 'package:ucbs_attendance_app/views/login/scan_screen.dart';
 import 'package:ucbs_attendance_app/views/login/sign_in_teacher.dart';
 
 class TeacherLogin extends StatefulWidget {
@@ -58,10 +61,10 @@ class FrostedLogicCard extends StatefulWidget {
 }
 
 class _FrostedLogicCardState extends State<FrostedLogicCard> {
+  final TextEditingController namecontroller = TextEditingController();
+  final TextEditingController employeeidcontroller = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    final TextEditingController namecontroller = TextEditingController();
-    final TextEditingController employeeidcontroller = TextEditingController();
     bool keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return AnimatedOpacity(
@@ -136,7 +139,33 @@ class _FrostedLogicCardState extends State<FrostedLogicCard> {
 
                     child: Center(
                       child: GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          final name = namecontroller.text.trim();
+                          final empId = employeeidcontroller.text.trim();
+
+                          if (name.isEmpty || empId.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Please fill all details"),
+                                backgroundColor: Colors.redAccent,
+                                behavior: SnackBarBehavior.floating,
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            return;
+                          }
+
+                          context.read<UserSession>().setName(name);
+                          context.read<UserSession>().setEmployeeId(empId);
+
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ScanScreen(),
+                            ),
+                          );
+                        },
+
                         child: Container(
                           decoration: BoxDecoration(
                             color: AppColors.accentBlue,
