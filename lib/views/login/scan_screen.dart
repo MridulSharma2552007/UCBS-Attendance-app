@@ -9,8 +9,10 @@ import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:ucbs_attendance_app/methods/supabase/verified_student.dart';
+import 'package:ucbs_attendance_app/methods/supabase/verify_teacher.dart';
 import 'package:ucbs_attendance_app/provider/user_session.dart';
-import 'package:ucbs_attendance_app/views/main/home.dart';
+import 'package:ucbs_attendance_app/views/main/student/home.dart';
+import 'package:ucbs_attendance_app/views/main/teacher/teacher_home.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -89,14 +91,12 @@ class _ScanScreenState extends State<ScanScreen> {
         }
       }
 
-      // ✅ Save result
       setState(() {
         personConfidence = conf;
         embeddingCaptured = hasEmbedding;
         _uploading = false;
       });
 
-      // ✅ STOP if face not good enough
       if (conf == null || conf < 0.50 || !hasEmbedding || faceVector == null) {
         debugPrint("Face not valid for attendance");
         return;
@@ -113,15 +113,26 @@ class _ScanScreenState extends State<ScanScreen> {
         );
       }
 
+      if (userdata.role == "Teacher") {
+        await VerifyTeacher().pushTeacherData(
+          email: userdata.email!,
+          name: userdata.name!,
+          vector: faceVector,
+          confidence: conf,
+        );
+      }
+
       // ✅ Navigate SAFELY
       if (!mounted) return;
 
       await Future.delayed(const Duration(seconds: 2));
       _controller?.dispose();
 
-      Navigator.of(
-        context,
-      ).pushReplacement(MaterialPageRoute(builder: (_) => const Home()));
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => userdata.role == "Teacher" ? TeacherHome() : Home(),
+        ),
+      );
     } catch (e) {
       debugPrint("Upload error: $e");
       setState(() => _uploading = false);
@@ -147,13 +158,10 @@ class _ScanScreenState extends State<ScanScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          /// CAMERA (FULL SCREEN, NO DISTORTION)
           Positioned.fill(child: CameraPreview(_controller!)),
 
-          /// INSTRUCTION OVERLAY
           Positioned(top: 40, left: 20, right: 20, child: InstructionCard()),
 
-          /// CONFIDENCE RESULT
           if (personConfidence != null)
             Positioned(
               bottom: 140,
@@ -208,8 +216,6 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 }
 
-/// ================= INSTRUCTION CARD =================
-
 class InstructionCard extends StatelessWidget {
   const InstructionCard({super.key});
 
@@ -240,8 +246,6 @@ class InstructionCard extends StatelessWidget {
     );
   }
 }
-
-/// ================= RESULT CARD =================
 
 class ResultCard extends StatelessWidget {
   final double confidence;
