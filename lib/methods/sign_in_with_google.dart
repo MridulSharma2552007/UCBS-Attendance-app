@@ -5,8 +5,6 @@ class SignInWithGoogle {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
 
-  /// 🔐 Sign in with Google (Firebase Auth)
-  /// Returns Firebase [User] on success, null on cancel
   Future<User?> signIn() async {
     try {
       // 1️⃣ Trigger Google Sign-In UI
@@ -39,7 +37,6 @@ class SignInWithGoogle {
     }
   }
 
-  /// 🚪 Sign out
   Future<void> signOut() async {
     await _googleSignIn.signOut();
     await _auth.signOut();

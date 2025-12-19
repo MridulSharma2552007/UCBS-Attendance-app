@@ -7,6 +7,7 @@ class UserSession extends ChangeNotifier {
   String? sem;
   String? email;
   String? employeeid;
+  bool isLogged = false;
   void setrole(String value) {
     role = value;
     notifyListeners();
@@ -34,6 +35,11 @@ class UserSession extends ChangeNotifier {
 
   void setEmployeeId(String value) {
     employeeid = value;
+    notifyListeners();
+  }
+
+  void isLoggedIn(bool value) {
+    isLogged = value;
     notifyListeners();
   }
 
