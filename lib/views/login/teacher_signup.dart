@@ -7,8 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
 import 'package:ucbs_attendance_app/provider/user_session.dart';
-import 'package:ucbs_attendance_app/views/login/scan_screen.dart';
 import 'package:ucbs_attendance_app/views/login/sign_in_teacher.dart';
+import 'package:ucbs_attendance_app/views/login/sign_up.dart';
 
 class TeacherLogin extends StatefulWidget {
   const TeacherLogin({super.key});
@@ -160,9 +160,7 @@ class _FrostedLogicCardState extends State<FrostedLogicCard> {
 
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(
-                              builder: (_) => const ScanScreen(),
-                            ),
+                            MaterialPageRoute(builder: (_) => const SignUp()),
                           );
                         },
 
