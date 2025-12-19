@@ -122,12 +122,11 @@ class _ScanScreenState extends State<ScanScreen> {
         );
       }
 
-      // ✅ Navigate SAFELY
       if (!mounted) return;
 
       await Future.delayed(const Duration(seconds: 2));
       _controller?.dispose();
-
+      
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (_) => userdata.role == "Teacher" ? TeacherHome() : Home(),
