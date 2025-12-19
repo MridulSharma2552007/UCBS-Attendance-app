@@ -102,7 +102,6 @@ class _ScanScreenState extends State<ScanScreen> {
         return;
       }
 
-      // ✅ Push to Supabase (Student only)
       if (userdata.role == "Student") {
         await VerifiedStudent().pushStudentData(
           email: userdata.email!,
