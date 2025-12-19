@@ -48,17 +48,24 @@ class _TeacherLoginState extends State<TeacherLogin> {
   }
 }
 
-class FrostedLogicCard extends StatelessWidget {
+class FrostedLogicCard extends StatefulWidget {
   final double opacity;
 
   const FrostedLogicCard({super.key, required this.opacity});
 
   @override
+  State<FrostedLogicCard> createState() => _FrostedLogicCardState();
+}
+
+class _FrostedLogicCardState extends State<FrostedLogicCard> {
+  @override
   Widget build(BuildContext context) {
+    final TextEditingController namecontroller = TextEditingController();
+    final TextEditingController employeeidcontroller = TextEditingController();
     bool keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return AnimatedOpacity(
-      opacity: opacity,
+      opacity: widget.opacity,
       duration: const Duration(milliseconds: 800),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(25),
@@ -109,28 +116,33 @@ class FrostedLogicCard extends StatelessWidget {
                   CustomTextFields(
                     textfieldhint: 'Enter Your Name',
                     inputType: TextInputType.text,
+                    controller: namecontroller,
                   ),
 
                   /// Employee Id
                   CustomTextFields(
                     textfieldhint: 'Enter Your Employee Id',
                     inputType: TextInputType.number,
+                    controller: employeeidcontroller,
                   ),
 
                   Container(
                     height: 55,
-                    margin: const EdgeInsets.only(top: 12,bottom: 10),
+                    margin: const EdgeInsets.only(top: 12, bottom: 10),
                     decoration: BoxDecoration(
                       color: Colors.blue.shade400,
                       borderRadius: BorderRadius.circular(12),
                     ),
 
                     child: Center(
-                      child: TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          "Submit",
-                          style: TextStyle(color: Colors.white, fontSize: 22),
+                      child: GestureDetector(
+                        onTap: () {},
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.accentBlue,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text('Submit'),
                         ),
                       ),
                     ),
@@ -141,12 +153,17 @@ class FrostedLogicCard extends StatelessWidget {
                     children: [
                       Text(
                         "Already logged in?",
-                        style: TextStyle(color: Colors.grey,fontSize: 13),
+                        style: TextStyle(color: Colors.grey, fontSize: 13),
                       ),
                       SizedBox(width: 4),
                       TextButton(
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>SignInTeacher()));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SignInTeacher(),
+                            ),
+                          );
                         },
                         style: TextButton.styleFrom(
                           padding: EdgeInsets.zero,
@@ -159,7 +176,7 @@ class FrostedLogicCard extends StatelessWidget {
                             color: Colors.blue,
                             decoration: TextDecoration.underline,
                             decorationColor: Colors.blue,
-                            fontSize: 13
+                            fontSize: 13,
                           ),
                         ),
                       ),
@@ -180,11 +197,12 @@ class FrostedLogicCard extends StatelessWidget {
 class CustomTextFields extends StatelessWidget {
   final String textfieldhint;
   final TextInputType inputType;
-
+  final TextEditingController controller;
   const CustomTextFields({
     super.key,
     required this.textfieldhint,
     required this.inputType,
+    required this.controller,
   });
 
   @override
@@ -201,6 +219,7 @@ class CustomTextFields extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           child: TextField(
+            controller: controller,
             keyboardType: inputType,
             style: const TextStyle(color: Colors.white),
 
