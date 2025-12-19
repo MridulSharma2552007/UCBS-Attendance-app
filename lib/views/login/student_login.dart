@@ -188,7 +188,7 @@ class _FrostedStudentCardState extends State<FrostedStudentCard> {
                       if (widget.nameController.text.trim().isEmpty ||
                           widget.rollNoController.text.trim().isEmpty ||
                           selectedSem == null) {
-                        controller.reset(); // slide back
+                        controller.reset(); 
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
