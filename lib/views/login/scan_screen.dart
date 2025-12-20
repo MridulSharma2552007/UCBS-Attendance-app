@@ -177,7 +177,7 @@ class _ScanScreenState extends State<ScanScreen> {
               ),
             ),
 
-          /// CAPTURE BUTTON
+         
           Positioned(
             bottom: 40,
             left: 0,
