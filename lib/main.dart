@@ -5,9 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ucbs_attendance_app/apis/apikeys.dart';
 import 'package:ucbs_attendance_app/firebase_options.dart';
 import 'package:ucbs_attendance_app/provider/user_session.dart';
-import 'package:ucbs_attendance_app/views/login/login.dart';
-import 'package:ucbs_attendance_app/views/main/student/home.dart';
-import 'package:ucbs_attendance_app/views/main/teacher/teacher_home.dart';
+import 'package:ucbs_attendance_app/views/login/app_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,25 +25,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Consumer<UserSession>(
-        builder: (context, session, _) {
-          if (!session.isLogged) {
-            return const Login();
-          }
-
-          if (session.role == "Student" && session.rollNo != null) {
-            return const Home();
-          }
-
-          if (session.role == "Teacher" && session.employeeid != null) {
-            return const TeacherHome();
-          }
-
-          return const Login();
-        },
-      ),
-    );
+    return MaterialApp(debugShowCheckedModeBanner: false, home: AppGate());
   }
 }
