@@ -71,7 +71,7 @@ Basically:
 
 ## 🧪 Current Progress
 
-- UI = ✔ **10%**
+- UI = ✔ **40%**
 - Face scanning = ✔ **basic**
 - AI detection = **WIP**
 - Database flow = **WIP**
