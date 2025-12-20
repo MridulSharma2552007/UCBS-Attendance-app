@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ucbs_attendance_app/methods/supabase/verified_student.dart';
 import 'package:ucbs_attendance_app/methods/supabase/verify_teacher.dart';
 import 'package:ucbs_attendance_app/provider/user_session.dart';
@@ -126,7 +127,11 @@ class _ScanScreenState extends State<ScanScreen> {
 
       await Future.delayed(const Duration(seconds: 2));
       _controller?.dispose();
-      
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLogged', true);
+      await prefs.setString('role', userdata.role!);
+
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (_) => userdata.role == "Teacher" ? TeacherHome() : Home(),
