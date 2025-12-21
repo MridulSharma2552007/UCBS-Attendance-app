@@ -107,5 +107,5 @@ Basically:
 
 If you read till here, you are either very interested in the project…  
 or **extremely bored**.  
-Either way — thanks. 🙏.
+Either way — thanks. 🙏
 
