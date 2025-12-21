@@ -6,7 +6,7 @@ class GetSubjectName {
     final response = await supabase
         .from('subjects')
         .select()
-        .order('created_at', ascending: false);
+        .order('created_at', ascending: true);
     return List<Map<String, dynamic>>.from(response);
   }
 }
