@@ -1,6 +1,5 @@
-
-
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
 
 class Home extends StatefulWidget {
@@ -11,8 +10,14 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  void setlogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool("isLogged", true);
+  }
+
   @override
   void initState() {
+    setlogin();
     super.initState();
   }
 

@@ -13,6 +13,7 @@ import 'package:ucbs_attendance_app/methods/supabase/verified_student.dart';
 import 'package:ucbs_attendance_app/methods/supabase/verify_teacher.dart';
 import 'package:ucbs_attendance_app/provider/user_session.dart';
 import 'package:ucbs_attendance_app/views/main/student/home.dart';
+import 'package:ucbs_attendance_app/views/main/teacher/pages/subject_selection.dart';
 import 'package:ucbs_attendance_app/views/main/teacher/teacher_home.dart';
 
 class ScanScreen extends StatefulWidget {
@@ -129,12 +130,13 @@ class _ScanScreenState extends State<ScanScreen> {
       _controller?.dispose();
 
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLogged', true);
+
       await prefs.setString('role', userdata.role!);
 
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (_) => userdata.role == "Teacher" ? TeacherHome() : Home(),
+          builder: (_) =>
+              userdata.role == "Teacher" ? SubjectSelection() : Home(),
         ),
       );
     } catch (e) {
@@ -177,7 +179,6 @@ class _ScanScreenState extends State<ScanScreen> {
               ),
             ),
 
-         
           Positioned(
             bottom: 40,
             left: 0,
