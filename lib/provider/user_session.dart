@@ -6,7 +6,7 @@ class UserSession extends ChangeNotifier {
   String? name;
   String? sem;
   String? email;
-  String? employeeid;
+  int? employeeid;
 
   void setrole(String value) {
     role = value;
@@ -33,7 +33,7 @@ class UserSession extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setEmployeeId(String value) {
+  void setEmployeeId(int value) {
     employeeid = value;
     notifyListeners();
   }

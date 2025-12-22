@@ -173,7 +173,7 @@ class FrostedLogicCard extends StatelessWidget {
                     action: (controller) async {
                       controller.loading();
 
-                      await Future.delayed(const Duration(milliseconds: 600));
+                      await Future.delayed(const Duration(milliseconds: 300));
 
                       if (nameController.text.trim().isEmpty ||
                           employeeIdController.text.trim().isEmpty ||
@@ -188,24 +188,36 @@ class FrostedLogicCard extends StatelessWidget {
                         return;
                       }
 
-                      controller.success();
+                      // ✅ PARSE FIRST
+                      final int employeeId = int.parse(
+                        employeeIdController.text.trim(),
+                      );
 
+                      final prefs = await SharedPreferences.getInstance();
+
+                      await prefs.setString('UserName', nameController.text);
+
+                      // 🔥 HARD PROOF
+                      debugPrint("DEBUG: employee_id SAVED = $employeeId");
+                      debugPrint("DEBUG: PREF KEYS = ${prefs.getKeys()}");
+
+                      // OPTIONAL but safe
+                      await prefs.reload();
+
+                      // ✅ UPDATE PROVIDER
                       context.read<UserSession>().setName(nameController.text);
                       context.read<UserSession>().setrollno(
-                        employeeIdController.text,
+                        employeeId.toString(),
                       );
-                      final teacherid = context.read<UserSession>().employeeid;
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.setString('UserName', nameController.text);
-                      await prefs.setString('employee_id', teacherid!);
 
-                      await Future.delayed(const Duration(milliseconds: 400));
+                      // ✅ ONLY NOW animate success
+                      controller.success();
+
+                      if (!context.mounted) return;
 
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const ScanScreen(),
-                        ),
+                        MaterialPageRoute(builder: (_) => const ScanScreen()),
                       );
                     },
                   ),

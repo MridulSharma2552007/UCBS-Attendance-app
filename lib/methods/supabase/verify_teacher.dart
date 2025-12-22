@@ -6,7 +6,7 @@ class VerifyTeacher {
   Future<void> pushTeacherData({
     required String email,
     required String name,
-    required String id,
+    required int id,
     required List<double> vector,
     required double confidence,
   }) async {

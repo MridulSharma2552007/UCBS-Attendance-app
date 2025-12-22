@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
 import 'package:ucbs_attendance_app/provider/user_session.dart';
 import 'package:ucbs_attendance_app/views/login/sign_in_teacher.dart';
@@ -139,7 +140,7 @@ class _FrostedLogicCardState extends State<FrostedLogicCard> {
 
                     child: Center(
                       child: GestureDetector(
-                        onTap: () {
+                        onTap: () async {
                           final name = namecontroller.text.trim();
                           final empId = employeeidcontroller.text.trim();
 
@@ -155,9 +156,15 @@ class _FrostedLogicCardState extends State<FrostedLogicCard> {
                             return;
                           }
 
-                          context.read<UserSession>().setName(name);
-                          context.read<UserSession>().setEmployeeId(empId);
-                          
+                     
+
+                         
+                          final prefs = await SharedPreferences.getInstance();
+
+                          final int employeeId = int.parse(empId);
+                          await prefs.setInt('employee_id', employeeId);
+                               context.read<UserSession>().setName(name);
+                          context.read<UserSession>().setEmployeeId(employeeId);                          
 
                           Navigator.pushReplacement(
                             context,

@@ -113,10 +113,16 @@ class _ScanScreenState extends State<ScanScreen> {
           confidence: conf,
         );
       }
+      final prefs = await SharedPreferences.getInstance();
+      final int? id = prefs.getInt('employee_id');
+
+      if (id == null) {
+        throw Exception("Employee ID not found in local storage");
+      }
 
       if (userdata.role == "Teacher") {
         await VerifyTeacher().pushTeacherData(
-          id: userdata.employeeid!,
+          id: id,
           email: userdata.email!,
           name: userdata.name!,
           vector: faceVector,
@@ -128,8 +134,6 @@ class _ScanScreenState extends State<ScanScreen> {
 
       await Future.delayed(const Duration(seconds: 2));
       _controller?.dispose();
-
-      final prefs = await SharedPreferences.getInstance();
 
       await prefs.setString('role', userdata.role!);
 
