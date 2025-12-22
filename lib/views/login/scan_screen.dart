@@ -116,6 +116,7 @@ class _ScanScreenState extends State<ScanScreen> {
 
       if (userdata.role == "Teacher") {
         await VerifyTeacher().pushTeacherData(
+          id: userdata.employeeid!,
           email: userdata.email!,
           name: userdata.name!,
           vector: faceVector,

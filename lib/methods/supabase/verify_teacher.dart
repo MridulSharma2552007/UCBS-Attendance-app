@@ -6,12 +6,13 @@ class VerifyTeacher {
   Future<void> pushTeacherData({
     required String email,
     required String name,
-
+    required String id,
     required List<double> vector,
     required double confidence,
   }) async {
     try {
       await _client.from('teachers').insert({
+        'employee_id': id,
         'email': email,
         'name': name,
         'face_vector': vector,

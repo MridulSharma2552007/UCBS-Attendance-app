@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ucbs_attendance_app/colors/colors.dart';
 import 'package:ucbs_attendance_app/provider/user_session.dart';
@@ -48,10 +49,7 @@ class _SignInTeacherState extends State<SignInTeacher> {
         child: Stack(
           children: [
             Positioned.fill(
-              child: Image.asset(
-                "assets/images/bg.jpeg",
-                fit: BoxFit.cover,
-              ),
+              child: Image.asset("assets/images/bg.jpeg", fit: BoxFit.cover),
             ),
             Align(
               alignment: Alignment.center,
@@ -192,12 +190,14 @@ class FrostedLogicCard extends StatelessWidget {
 
                       controller.success();
 
-                      context.read<UserSession>().setName(
-                            nameController.text,
-                          );
+                      context.read<UserSession>().setName(nameController.text);
                       context.read<UserSession>().setrollno(
-                            employeeIdController.text,
-                          );
+                        employeeIdController.text,
+                      );
+                      final teacherid = context.read<UserSession>().employeeid;
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.setString('UserName', nameController.text);
+                      await prefs.setString('employee_id', teacherid!);
 
                       await Future.delayed(const Duration(milliseconds: 400));
 

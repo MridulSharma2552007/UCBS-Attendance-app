@@ -17,6 +17,7 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
         children: [
           SizedBox(height: 80),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               CircleAvatar(
                 radius: 30.0,

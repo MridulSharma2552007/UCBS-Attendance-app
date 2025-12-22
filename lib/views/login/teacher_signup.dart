@@ -157,6 +157,7 @@ class _FrostedLogicCardState extends State<FrostedLogicCard> {
 
                           context.read<UserSession>().setName(name);
                           context.read<UserSession>().setEmployeeId(empId);
+                          
 
                           Navigator.pushReplacement(
                             context,
