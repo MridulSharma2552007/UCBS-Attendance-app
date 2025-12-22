@@ -25,17 +25,24 @@ class _TeacherHomeState extends State<TeacherHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.accentOrange,
-      body: Scaffold(
-        body: _pages[_currentIndex],
-        bottomNavigationBar: Navbar(
-          currentIndex: _currentIndex,
-          onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-        ),
+      body: Stack(
+        children: [
+          _pages[_currentIndex],
+
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Navbar(
+              currentIndex: _currentIndex,
+              onTap: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

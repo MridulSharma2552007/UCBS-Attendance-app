@@ -7,8 +7,8 @@ class Navbar extends StatelessWidget {
   Navbar({super.key, required this.currentIndex, required this.onTap});
 
   final items = [
-    Icons.center_focus_strong,
-    Icons.group,
+    Icons.home_rounded,
+    Icons.search_rounded,
     Icons.bar_chart_rounded,
     Icons.person,
   ];

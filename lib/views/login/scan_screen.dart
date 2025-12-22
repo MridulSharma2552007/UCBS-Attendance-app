@@ -14,7 +14,6 @@ import 'package:ucbs_attendance_app/methods/supabase/verify_teacher.dart';
 import 'package:ucbs_attendance_app/provider/user_session.dart';
 import 'package:ucbs_attendance_app/views/main/student/home.dart';
 import 'package:ucbs_attendance_app/views/main/teacher/pages/subject_selection.dart';
-import 'package:ucbs_attendance_app/views/main/teacher/teacher_home.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
