@@ -32,7 +32,25 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
       backgroundColor: AppColors.bgDark,
       body: FutureBuilder<Map<String, dynamic>>(
         future: _loadTeacher(),
-        builder: (context, snapshot) {},
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                "Error: ${snapshot.error}",
+                style: const TextStyle(color: Colors.red),
+              ),
+            );
+          }
+          final teacher = snapshot.data!;
+          return Column(
+            children: [
+              
+            ],
+          );
+        },
       ),
     );
   }
