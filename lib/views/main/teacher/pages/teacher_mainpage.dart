@@ -13,13 +13,14 @@ class TeacherMainpage extends StatefulWidget {
 }
 
 class _TeacherMainpageState extends State<TeacherMainpage> {
+  final client = Supabase.instance.client;
   Future<Map<String, dynamic>> _loadTeacher() async {
     final prefs = await SharedPreferences.getInstance();
     final employeeId = prefs.getInt('employee_id');
     if (employeeId == null) {
       throw Exception("Employee ID not found In DB");
     }
-    final client = Supabase.instance.client;
+
     final data = await client
         .from('teachers')
         .select()
@@ -95,7 +96,7 @@ class StartClassWidget extends StatelessWidget {
       height: 200,
       width: 300,
       decoration: BoxDecoration(
-        color: AppColors.accentBlue,
+        color: AppColors.accentBlue.withValues(alpha: 0.80),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Padding(
@@ -121,7 +122,15 @@ class StartClassWidget extends StatelessWidget {
               ),
             ),
             Spacer(),
-            ElevatedButton(onPressed: () {}, child: Text('Start')),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Spacer(),
+                  ElevatedButton(onPressed: () {}, child: Text('Start')),
+                ],
+              ),
+            ),
           ],
         ),
       ),
