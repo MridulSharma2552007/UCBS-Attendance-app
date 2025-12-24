@@ -47,6 +47,9 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
             );
           }
           final teacher = snapshot.data!;
+          final List<String> subjects = List<String>.from(
+            teacher['subject'] ?? [],
+          );
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
@@ -54,6 +57,49 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
               children: [
                 const SizedBox(height: 50),
                 Header(teacher: teacher),
+                Text(
+                  'Your Subjects',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 20,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                SizedBox(height: 10),
+                SizedBox(
+                  height: 200,
+                  child: ListView.builder(
+                    itemCount: subjects.length,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Container(
+                          height: 200,
+                          width: 300,
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: AppColors.accentBlue.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: AppColors.accentBlue.withOpacity(0.4),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Text(
+                              subjects[index],
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
           );
@@ -91,17 +137,16 @@ class _HeaderState extends State<Header> {
   void initState() {
     super.initState();
     today = DateTime.now();
-    weekdays = List.generate(7, (i) => today.add(Duration(days: i - 3)));
+    weekdays = List.generate(7, (i) => today.add(Duration(days: i - 2)));
   }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 300,
+      height: 210,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// Top row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -140,7 +185,6 @@ class _HeaderState extends State<Header> {
 
           const SizedBox(height: 24),
 
-          /// Date strip
           SizedBox(
             height: 90,
             child: ListView.builder(
