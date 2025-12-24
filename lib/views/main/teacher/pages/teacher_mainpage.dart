@@ -51,6 +51,7 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
             teacher['subject'] ?? [],
           );
           return SingleChildScrollView(
+            scrollDirection: Axis.vertical,
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,42 +66,106 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
                   ),
                 ),
                 SizedBox(height: 10),
-                SizedBox(
-                  height: 200,
-                  child: ListView.builder(
-                    itemCount: subjects.length,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Container(
-                          height: 200,
-                          width: 300,
-                          margin: const EdgeInsets.only(bottom: 12),
-                          decoration: BoxDecoration(
-                            color: AppColors.accentBlue.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(
-                              color: AppColors.accentBlue.withOpacity(0.4),
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Text(
-                              subjects[index],
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+                SubjectCard(subjects: subjects),
+                SizedBox(height: 10),
+                Text(
+                  'Start a Class',
+                  style: GoogleFonts.dmSans(
+                    color: AppColors.textSecondary,
+                    fontSize: 20,
                   ),
                 ),
+                SizedBox(height: 10),
+                StartClassWidget(),
               ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class StartClassWidget extends StatelessWidget {
+  const StartClassWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 200,
+      width: 300,
+      decoration: BoxDecoration(
+        color: AppColors.accentBlue,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 10),
+            Text(
+              'Start Class',
+              style: GoogleFonts.dmSans(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            Text(
+              'Select a subject and all students will be notifies',
+              style: GoogleFonts.dmSans(
+                fontSize: 18,
+
+                color: AppColors.textPrimary,
+              ),
+            ),
+            Spacer(),
+            ElevatedButton(onPressed: () {}, child: Text('Start')),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SubjectCard extends StatelessWidget {
+  const SubjectCard({super.key, required this.subjects});
+
+  final List<String> subjects;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 200,
+      child: ListView.builder(
+        itemCount: subjects.length,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Container(
+              height: 200,
+              width: 300,
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: AppColors.accentBlue,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: AppColors.accentBlue.withOpacity(0.4),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  subjects[index],
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
             ),
           );
         },
