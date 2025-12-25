@@ -79,7 +79,7 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
                   ),
                 ),
                 SizedBox(height: 10),
-                StartClassWidget(),
+                StartClassWidget(subjects: subjects),
                 SizedBox(height: 30),
                 Text(
                   'Classes Info',
@@ -117,7 +117,8 @@ class ClassInfo extends StatelessWidget {
 }
 
 class StartClassWidget extends StatelessWidget {
-  const StartClassWidget({super.key});
+  final List<Map<String, dynamic>> subjects;
+  const StartClassWidget({super.key, required this.subjects});
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +173,7 @@ class StartClassWidget extends StatelessWidget {
                         context: context,
                         backgroundColor: Colors.transparent,
                         isScrollControlled: true,
-                        builder: (_) => const StartClassSheet(),
+                        builder: (_) => StartClassSheet(subjects: subjects),
                       );
                     },
 
@@ -371,7 +372,8 @@ class _HeaderState extends State<Header> {
 }
 
 class StartClassSheet extends StatelessWidget {
-  const StartClassSheet({super.key});
+  final List<Map<String, dynamic>> subjects;
+  const StartClassSheet({super.key, required this.subjects});
 
   @override
   Widget build(BuildContext context) {
