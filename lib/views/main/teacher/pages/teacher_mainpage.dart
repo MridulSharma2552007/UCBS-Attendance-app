@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -77,10 +80,37 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
                 ),
                 SizedBox(height: 10),
                 StartClassWidget(),
+                SizedBox(height: 30),
+                Text(
+                  'Classes Info',
+                  style: GoogleFonts.dmSans(
+                    color: AppColors.textSecondary,
+                    fontSize: 20,
+                  ),
+                ),
+                ClassInfo(),
               ],
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class ClassInfo extends StatelessWidget {
+  const ClassInfo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 120),
+      child: Container(
+        height: 200,
+        decoration: BoxDecoration(
+          color: AppColors.cardDark,
+          borderRadius: BorderRadius.circular(20),
+        ),
       ),
     );
   }
@@ -98,7 +128,6 @@ class StartClassWidget extends StatelessWidget {
         color: const Color(0xFF5E548E).withOpacity(0.85),
 
         borderRadius: BorderRadius.circular(20),
-        
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -136,7 +165,17 @@ class StartClassWidget extends StatelessWidget {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      HapticFeedback.mediumImpact();
+
+                      showModalBottomSheet(
+                        context: context,
+                        backgroundColor: Colors.transparent,
+                        isScrollControlled: true,
+                        builder: (_) => const StartClassSheet(),
+                      );
+                    },
+
                     child: const Text("Start"),
                   ),
                 ],
@@ -326,6 +365,59 @@ class _HeaderState extends State<Header> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class StartClassSheet extends StatelessWidget {
+  const StartClassSheet({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.55,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.65),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(26),
+              ),
+              border: Border.all(color: Colors.white12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white24,
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                ),
+                Text(
+                  'Select Subject',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                SizedBox(height: 10),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
