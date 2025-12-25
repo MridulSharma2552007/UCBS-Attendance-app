@@ -161,9 +161,15 @@ class _SubjectSelectionState extends State<SubjectSelection> {
                   return;
                 }
 
-                final List<String> selectedSubjects = selectedIndexes
-                    .map((i) => subjects[i]['subjectsName'] as String)
-                    .toList();
+                final List<Map<String, dynamic>> selectedSubjects =
+                    selectedIndexes
+                        .map(
+                          (i) => {
+                            "name": subjects[i]['subjectsName'],
+                            "sem": subjects[i]['sem'],
+                          },
+                        )
+                        .toList();
 
                 if (selectedSubjects.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(

@@ -48,9 +48,8 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
             );
           }
           final teacher = snapshot.data!;
-          final List<String> subjects = List<String>.from(
-            teacher['subject'] ?? [],
-          );
+          final List<Map<String, dynamic>> subjects =
+              List<Map<String, dynamic>>.from(teacher['subject'] ?? []);
           return SingleChildScrollView(
             scrollDirection: Axis.vertical,
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -96,11 +95,13 @@ class StartClassWidget extends StatelessWidget {
       height: 200,
       width: 300,
       decoration: BoxDecoration(
-        color: AppColors.accentBlue.withValues(alpha: 0.80),
+        color: const Color(0xFF5E548E).withOpacity(0.85),
+
         borderRadius: BorderRadius.circular(20),
+        
       ),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -127,7 +128,17 @@ class StartClassWidget extends StatelessWidget {
               child: Row(
                 children: [
                   Spacer(),
-                  ElevatedButton(onPressed: () {}, child: Text('Start')),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: AppColors.bgDark,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: () {},
+                    child: const Text("Start"),
+                  ),
                 ],
               ),
             ),
@@ -141,7 +152,7 @@ class StartClassWidget extends StatelessWidget {
 class SubjectCard extends StatelessWidget {
   const SubjectCard({super.key, required this.subjects});
 
-  final List<String> subjects;
+  final List<Map<String, dynamic>> subjects;
 
   @override
   Widget build(BuildContext context) {
@@ -158,21 +169,33 @@ class SubjectCard extends StatelessWidget {
               width: 300,
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: AppColors.accentBlue,
+                color: AppColors.accentBlue.withOpacity(0.55),
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: AppColors.accentBlue.withOpacity(0.4),
-                ),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Text(
-                  subjects[index],
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(width: 6),
+                    Text("📘", style: TextStyle(fontSize: 16)),
+                    Text(
+                      subjects[index]['name'],
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+
+                    Text(
+                      'Semester: ${subjects[index]['sem']}',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -273,7 +296,7 @@ class _HeaderState extends State<Header> {
                   margin: const EdgeInsets.only(right: 14),
                   decoration: BoxDecoration(
                     color: isToday
-                        ? AppColors.accentBlue
+                        ? AppColors.accentBlue.withOpacity(0.8)
                         : Colors.white.withOpacity(0.06),
                     borderRadius: BorderRadius.circular(18),
                   ),
