@@ -386,7 +386,7 @@ class StartClassSheet extends StatelessWidget {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.55,
+            height: MediaQuery.of(context).size.height * 0.60,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.black.withOpacity(0.65),
@@ -416,6 +416,39 @@ class StartClassSheet extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 10),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: subjects.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(
+                          subjects[index]['name'],
+                          style: GoogleFonts.dmSans(
+                            color: AppColors.textPrimary,
+                            fontSize: 18,
+                          ),
+                        ),
+                        subtitle: Text(
+                          'Semester: ${subjects[index]['sem']}',
+                          style: GoogleFonts.dmSans(
+                            color: AppColors.textSecondary,
+                            fontSize: 14,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          color: AppColors.textSecondary,
+                          size: 16,
+                        ),
+                        onTap: () {
+                          // select subject
+                        },
+                      );
+                    },
+                  ),
+                ),
+               
               ],
             ),
           ),
