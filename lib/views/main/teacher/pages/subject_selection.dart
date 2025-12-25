@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
-import 'package:ucbs_attendance_app/methods/supabase/get_subject_name.dart';
-import 'package:ucbs_attendance_app/provider/user_session.dart';
+import 'package:ucbs_attendance_app/methods/supabase/Teacher/get_subject_name.dart';
+import 'package:ucbs_attendance_app/provider/Data/user_session.dart';
 import 'package:ucbs_attendance_app/views/main/teacher/pages/teacher_mainpage.dart';
 
 class SubjectSelection extends StatefulWidget {

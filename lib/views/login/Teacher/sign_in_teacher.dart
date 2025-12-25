@@ -8,8 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ucbs_attendance_app/colors/colors.dart';
-import 'package:ucbs_attendance_app/provider/user_session.dart';
-import 'package:ucbs_attendance_app/views/login/scan_screen.dart';
+import 'package:ucbs_attendance_app/provider/Data/user_session.dart';
+import 'package:ucbs_attendance_app/views/login/Shared/scan_screen.dart';
 
 class SignInTeacher extends StatefulWidget {
   const SignInTeacher({super.key});

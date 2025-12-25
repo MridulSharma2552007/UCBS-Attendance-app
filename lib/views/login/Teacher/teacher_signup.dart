@@ -7,9 +7,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
-import 'package:ucbs_attendance_app/provider/user_session.dart';
-import 'package:ucbs_attendance_app/views/login/sign_in_teacher.dart';
-import 'package:ucbs_attendance_app/views/login/sign_up.dart';
+import 'package:ucbs_attendance_app/provider/Data/user_session.dart';
+import 'package:ucbs_attendance_app/views/login/Teacher/sign_in_teacher.dart';
+import 'package:ucbs_attendance_app/views/login/Shared/sign_up.dart';
 
 class TeacherLogin extends StatefulWidget {
   const TeacherLogin({super.key});

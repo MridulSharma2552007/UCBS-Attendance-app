@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ucbs_attendance_app/apis/apikeys.dart';
 import 'package:ucbs_attendance_app/firebase_options.dart';
-import 'package:ucbs_attendance_app/provider/user_session.dart';
-import 'package:ucbs_attendance_app/views/login/app_gate.dart';
+import 'package:ucbs_attendance_app/provider/Data/user_session.dart';
+import 'package:ucbs_attendance_app/views/login/Gates/app_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

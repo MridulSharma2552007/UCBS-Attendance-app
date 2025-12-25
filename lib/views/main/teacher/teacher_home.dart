@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ucbs_attendance_app/views/main/teacher/navbar/navbar.dart';
+import 'package:ucbs_attendance_app/views/main/teacher/Navigation/navbar.dart';
 import 'package:ucbs_attendance_app/views/main/teacher/pages/report.dart';
 import 'package:ucbs_attendance_app/views/main/teacher/pages/search.dart';
 import 'package:ucbs_attendance_app/views/main/teacher/pages/settings.dart';

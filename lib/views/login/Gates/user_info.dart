@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
-import 'package:ucbs_attendance_app/provider/user_session.dart';
-import 'package:ucbs_attendance_app/views/login/student_login.dart';
-import 'package:ucbs_attendance_app/views/login/teacher_signup.dart';
+import 'package:ucbs_attendance_app/provider/Data/user_session.dart';
+import 'package:ucbs_attendance_app/views/login/Student/student_login.dart';
+import 'package:ucbs_attendance_app/views/login/Teacher/teacher_signup.dart';
 
 class UserInfo extends StatefulWidget {
   const UserInfo({super.key});

@@ -371,10 +371,15 @@ class _HeaderState extends State<Header> {
   }
 }
 
-class StartClassSheet extends StatelessWidget {
+class StartClassSheet extends StatefulWidget {
   final List<Map<String, dynamic>> subjects;
   const StartClassSheet({super.key, required this.subjects});
 
+  @override
+  State<StartClassSheet> createState() => _StartClassSheetState();
+}
+
+class _StartClassSheetState extends State<StartClassSheet> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -418,19 +423,19 @@ class StartClassSheet extends StatelessWidget {
                 SizedBox(height: 10),
                 Expanded(
                   child: ListView.builder(
-                    itemCount: subjects.length,
+                    itemCount: widget.subjects.length,
                     itemBuilder: (context, index) {
                       return ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
-                          subjects[index]['name'],
+                          widget.subjects[index]['name'],
                           style: GoogleFonts.dmSans(
                             color: AppColors.textPrimary,
                             fontSize: 18,
                           ),
                         ),
                         subtitle: Text(
-                          'Semester: ${subjects[index]['sem']}',
+                          'Semester: ${widget.subjects[index]['sem']}',
                           style: GoogleFonts.dmSans(
                             color: AppColors.textSecondary,
                             fontSize: 14,
@@ -442,13 +447,16 @@ class StartClassSheet extends StatelessWidget {
                           size: 16,
                         ),
                         onTap: () {
-                          // select subject
+                          final subject = widget.subjects[index];
+
+                          print(
+                            'Selected subject: ${subject['name']} | Semester: ${subject['sem']}',
+                          );
                         },
                       );
                     },
                   ),
                 ),
-               
               ],
             ),
           ),

@@ -3,9 +3,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
-import 'package:ucbs_attendance_app/methods/sign_in_with_google.dart';
-import 'package:ucbs_attendance_app/provider/user_session.dart';
-import 'package:ucbs_attendance_app/views/login/scan_screen.dart';
+import 'package:ucbs_attendance_app/methods/Firebase/sign_in_with_google.dart';
+import 'package:ucbs_attendance_app/provider/Data/user_session.dart';
+import 'package:ucbs_attendance_app/views/login/Shared/scan_screen.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});

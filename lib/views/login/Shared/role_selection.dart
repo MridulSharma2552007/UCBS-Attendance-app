@@ -6,7 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
-import 'package:ucbs_attendance_app/provider/user_session.dart';
+import 'package:ucbs_attendance_app/provider/Data/user_session.dart';
 
 class RoleSelection extends StatefulWidget {
   final PageController controller;

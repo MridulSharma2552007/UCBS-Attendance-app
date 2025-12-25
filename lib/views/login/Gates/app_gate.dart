@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ucbs_attendance_app/views/login/login.dart';
+import 'package:ucbs_attendance_app/views/login/Shared/login.dart';
 import 'package:ucbs_attendance_app/views/main/student/home.dart';
 import 'package:ucbs_attendance_app/views/main/teacher/teacher_home.dart';
 
