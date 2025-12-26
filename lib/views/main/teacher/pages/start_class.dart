@@ -25,7 +25,7 @@ class _StartClassState extends State<StartClass> {
     final client = Supabase.instance.client;
     final response = await client
         .from('live_class')
-        .delete()
+        .update({'is_activated': false})
         .eq('teacher_id', employeeId);
     setState(() {
       isClassLive = false;
