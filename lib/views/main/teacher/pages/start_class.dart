@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class StartClass extends StatefulWidget {
   final List<Map<String, dynamic>> subjects;
@@ -10,11 +13,30 @@ class StartClass extends StatefulWidget {
 }
 
 class _StartClassState extends State<StartClass> {
+  bool isClassLive = false;
+  Future<void> StartClass() async {
+    HapticFeedback.mediumImpact();
+    final subject = widget.subjects.first;
+    final prefs = await SharedPreferences.getInstance();
+    final employeeId = prefs.getInt('employee_id');
+    if (employeeId == null) {
+      throw Exception("Employee ID not found In DB");
+    }
+
+    final client = Supabase.instance.client;
+    final response = await client.from('live_class').insert({
+      'teacher_id': employeeId,
+      'subjectName': subject['name'],
+      'sem': subject['sem'],
+    });
+    setState(() {
+      isClassLive = true;
+    });
+  }
+
+  Map<String, dynamic> get subject => widget.subjects.first;
   @override
   Widget build(BuildContext context) {
-    // since you pass only ONE subject
-    final subject = widget.subjects.first;
-
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F0F),
       body: SafeArea(
@@ -23,7 +45,6 @@ class _StartClassState extends State<StartClass> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -44,7 +65,6 @@ class _StartClassState extends State<StartClass> {
 
               const SizedBox(height: 30),
 
-              /// Subject card
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
@@ -77,31 +97,26 @@ class _StartClassState extends State<StartClass> {
 
               const SizedBox(height: 40),
 
-              /// Live indicator
               Row(
                 children: [
                   Container(
                     width: 10,
                     height: 10,
-                    decoration: const BoxDecoration(
-                      color: Colors.greenAccent,
+                    decoration: BoxDecoration(
+                      color: isClassLive ? Colors.green : Colors.red,
                       shape: BoxShape.circle,
                     ),
                   ),
                   const SizedBox(width: 10),
                   const Text(
                     'Class is live',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
                 ],
               ),
 
               const SizedBox(height: 30),
 
-              /// Timer (static for now)
               Center(
                 child: Text(
                   '00 : 00 : 00',
@@ -115,11 +130,35 @@ class _StartClassState extends State<StartClass> {
               ),
 
               const Spacer(),
+              if (!isClassLive)
+                GestureDetector(
+                  onTap: () {
+                    StartClass();
+                  },
+                  child: Container(
+                    height: 60,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.greenAccent,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: Colors.green.withOpacity(0.4)),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'Start Class',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              SizedBox(height: 20),
 
-              /// End class button
               GestureDetector(
                 onTap: () {
-                  // later: end class + update DB
                   Navigator.pop(context);
                 },
                 child: Container(
@@ -128,7 +167,9 @@ class _StartClassState extends State<StartClass> {
                   decoration: BoxDecoration(
                     color: const Color(0xFF1F1F1F),
                     borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: Colors.redAccent.withOpacity(0.4)),
+                    border: Border.all(
+                      color: Colors.redAccent.withOpacity(0.4),
+                    ),
                   ),
                   child: const Center(
                     child: Text(
