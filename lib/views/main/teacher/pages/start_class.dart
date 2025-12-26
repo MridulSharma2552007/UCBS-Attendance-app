@@ -14,6 +14,24 @@ class StartClass extends StatefulWidget {
 
 class _StartClassState extends State<StartClass> {
   bool isClassLive = false;
+  Future<void> EndClass() async {
+    HapticFeedback.mediumImpact();
+    final prefs = await SharedPreferences.getInstance();
+    final employeeId = prefs.getInt('employee_id');
+    if (employeeId == null) {
+      throw Exception("Employee ID not found In DB");
+    }
+
+    final client = Supabase.instance.client;
+    final response = await client
+        .from('live_class')
+        .delete()
+        .eq('teacher_id', employeeId);
+    setState(() {
+      isClassLive = false;
+    });
+  }
+
   Future<void> StartClass() async {
     HapticFeedback.mediumImpact();
     final subject = widget.subjects.first;
@@ -108,8 +126,8 @@ class _StartClassState extends State<StartClass> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Text(
-                    'Class is live',
+                  Text(
+                    isClassLive ? 'Class is live' : 'Class not started',
                     style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
                 ],
@@ -159,7 +177,7 @@ class _StartClassState extends State<StartClass> {
 
               GestureDetector(
                 onTap: () {
-                  Navigator.pop(context);
+                  EndClass();
                 },
                 child: Container(
                   height: 60,
