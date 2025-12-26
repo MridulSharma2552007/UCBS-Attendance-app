@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
+import 'package:ucbs_attendance_app/views/main/teacher/pages/start_class.dart';
 
 class TeacherMainpage extends StatefulWidget {
   const TeacherMainpage({super.key});
@@ -126,7 +127,7 @@ class StartClassWidget extends StatelessWidget {
       height: 200,
       width: 300,
       decoration: BoxDecoration(
-        color: const Color(0xFF5E548E).withOpacity(0.85),
+        color: AppColors.cardDark,
 
         borderRadius: BorderRadius.circular(20),
       ),
@@ -209,7 +210,7 @@ class SubjectCard extends StatelessWidget {
               width: 300,
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: AppColors.accentBlue.withOpacity(0.85),
+                color: AppColors.cardDark,
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Padding(
@@ -218,7 +219,7 @@ class SubjectCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(width: 6),
-                    Text("📘", style: TextStyle(fontSize: 16)),
+                    Text("📑", style: TextStyle(fontSize: 16)),
                     Text(
                       subjects[index]['name'],
                       style: const TextStyle(
@@ -451,6 +452,19 @@ class _StartClassSheetState extends State<StartClassSheet> {
 
                           print(
                             'Selected subject: ${subject['name']} | Semester: ${subject['sem']}',
+                          );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => StartClass(
+                                subjects: [
+                                  {
+                                    "name": subject['name'],
+                                    "sem": subject['sem'],
+                                  },
+                                ],
+                              ),
+                            ),
                           );
                         },
                       );
