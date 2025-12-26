@@ -33,19 +33,39 @@ class _StartClassState extends State<StartClass> {
   }
 
   Future<void> StartClass() async {
-    HapticFeedback.mediumImpact();
-    final subject = widget.subjects.first;
+    final client = Supabase.instance.client;
     final prefs = await SharedPreferences.getInstance();
     final employeeId = prefs.getInt('employee_id');
     if (employeeId == null) {
       throw Exception("Employee ID not found In DB");
     }
+    final check = await client
+        .from('live_class')
+        .select()
+        .eq('teacher_id', employeeId)
+        .eq('is_activated', true)
+        .maybeSingle();
+    if (check != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "A class is already live. End it before starting a new one.",
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
 
-    final client = Supabase.instance.client;
-    final response = await client.from('live_class').insert({
+    HapticFeedback.mediumImpact();
+    final subject = widget.subjects.first;
+
+    await client.from('live_class').insert({
       'teacher_id': employeeId,
       'subjectName': subject['name'],
       'sem': subject['sem'],
+      'is_activated': true,
+      'created_at': DateTime.now().toIso8601String(),
     });
     setState(() {
       isClassLive = true;
