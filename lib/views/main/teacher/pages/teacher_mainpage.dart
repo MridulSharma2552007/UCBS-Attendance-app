@@ -209,7 +209,7 @@ class SubjectCard extends StatelessWidget {
               width: 300,
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: AppColors.accentBlue.withOpacity(0.55),
+                color: AppColors.accentBlue.withOpacity(0.85),
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Padding(
