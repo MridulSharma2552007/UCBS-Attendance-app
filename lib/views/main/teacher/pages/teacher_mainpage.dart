@@ -124,7 +124,8 @@ class StartClassWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 200,
+      height: 220,
+      margin: const EdgeInsets.only(bottom: 20),
       width: 300,
       decoration: BoxDecoration(
         color: AppColors.cardDark,
@@ -138,9 +139,16 @@ class StartClassWidget extends StatelessWidget {
           children: [
             SizedBox(height: 10),
             Text(
+              'Quick Actions',
+              style: GoogleFonts.dmSans(
+                fontSize: 18,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            Text(
               'Start Class',
               style: GoogleFonts.dmSans(
-                fontSize: 20,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
               ),

@@ -14,6 +14,34 @@ class StartClass extends StatefulWidget {
 
 class _StartClassState extends State<StartClass> {
   bool isClassLive = false;
+  bool showEndButton = false;
+  Future<void> showEndBtn() async {
+    final client = Supabase.instance.client;
+    final prefs = await SharedPreferences.getInstance();
+    final employeeId = prefs.getInt('employee_id');
+    if (employeeId == null) {
+      throw Exception("Employee ID not found In DB");
+    }
+    final responseEnd = await client
+        .from('live_class')
+        .select()
+        .eq('teacher_id', employeeId)
+        .eq('subjectName', subject['name'])
+        .eq('is_activated', true)
+        .maybeSingle();
+    if (responseEnd != null) {
+      setState(() {
+        showEndButton = true;
+        isClassLive = true;
+      });
+    } else {
+      setState(() {
+        showEndButton = false;
+        isClassLive = false;
+      });
+    }
+  }
+
   Future<void> EndClass() async {
     HapticFeedback.mediumImpact();
     final prefs = await SharedPreferences.getInstance();
@@ -26,7 +54,8 @@ class _StartClassState extends State<StartClass> {
     final response = await client
         .from('live_class')
         .update({'is_activated': false})
-        .eq('teacher_id', employeeId);
+        .eq('teacher_id', employeeId)
+        .eq('subjectName', subject['name']);
     setState(() {
       isClassLive = false;
     });
@@ -69,10 +98,17 @@ class _StartClassState extends State<StartClass> {
     });
     setState(() {
       isClassLive = true;
+      showEndButton = true;
     });
   }
 
   Map<String, dynamic> get subject => widget.subjects.first;
+  @override
+  void initState() {
+    super.initState();
+    showEndBtn();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -195,31 +231,44 @@ class _StartClassState extends State<StartClass> {
                 ),
               SizedBox(height: 20),
 
-              GestureDetector(
-                onTap: () {
-                  EndClass();
-                },
-                child: Container(
-                  height: 60,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1F1F1F),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: Colors.redAccent.withOpacity(0.4),
-                    ),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'End Class',
-                      style: TextStyle(
-                        color: Colors.redAccent,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
+              Container(
+                child: showEndButton && isClassLive
+                    ? GestureDetector(
+                        onTap: () {
+                          EndClass();
+                        },
+                        child: Container(
+                          height: 60,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1F1F1F),
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: Colors.redAccent.withOpacity(0.4),
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'End Class',
+                              style: TextStyle(
+                                color: Colors.redAccent,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          'Start a class first , or close existing live class ',
+                          style: TextStyle(
+                            color: Colors.white38,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
               ),
             ],
           ),
