@@ -89,7 +89,7 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
                     fontSize: 20,
                   ),
                 ),
-                ClassInfo(),
+                ClassInfo(client: client),
               ],
             ),
           );
@@ -99,18 +99,89 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
   }
 }
 
-class ClassInfo extends StatelessWidget {
-  const ClassInfo({super.key});
+class ClassInfo extends StatefulWidget {
+  final SupabaseClient client;
+  const ClassInfo({super.key, required this.client});
+
+  @override
+  State<ClassInfo> createState() => _ClassInfoState();
+}
+
+class _ClassInfoState extends State<ClassInfo> {
+  List<Map<String, dynamic>> classes = [];
+  bool isLoading = true;
+  Future<void> fetchClassInfo() async {
+    final List<Map<String, dynamic>> response = await widget.client
+        .from('live_class')
+        .select()
+        .eq('is_activated', true);
+    if (!mounted) return;
+    setState(() {
+      classes = response;
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Padding(
+        padding: const EdgeInsets.all(120),
+        child: Center(
+          child: CircularProgressIndicator(color: AppColors.accentBlue),
+        ),
+      );
+    }
+
+    if (classes.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 120),
+        child: Text(
+          "No active classes at the moment.",
+          style: GoogleFonts.dmSans(
+            color: AppColors.textSecondary,
+            fontSize: 16,
+          ),
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 120),
       child: Container(
-        height: 200,
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.cardDark,
           borderRadius: BorderRadius.circular(20),
+        ),
+        child: ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: classes.length,
+          itemBuilder: (context, index) {
+            final classInfo = classes[index];
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(
+                  classInfo['subjectName'],
+                  style: GoogleFonts.dmSans(
+                    color: AppColors.textPrimary,
+                    fontSize: 18,
+                  ),
+                ),
+                subtitle: Text(
+                  'Semester ${classInfo['sem']}',
+                  style: GoogleFonts.dmSans(
+                    color: AppColors.textSecondary,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

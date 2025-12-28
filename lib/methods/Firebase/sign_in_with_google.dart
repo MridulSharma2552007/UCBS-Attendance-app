@@ -1,47 +1,59 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
 import 'package:google_sign_in/google_sign_in.dart';
 
 class SignInWithGoogle {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email', 'profile'],
+  );
 
   Future<User?> signIn() async {
     try {
-      // 1️⃣ Trigger Google Sign-In UI
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      // 🌐 WEB → Use Firebase popup
+      if (kIsWeb) {
+        final GoogleAuthProvider googleProvider = GoogleAuthProvider();
+        googleProvider.addScope('email');
+        googleProvider.addScope('profile');
 
-      if (googleUser == null) {
-        // User cancelled sign-in
-        return null;
+        final UserCredential userCredential =
+            await _auth.signInWithPopup(googleProvider);
+
+        return userCredential.user;
       }
 
-      // 2️⃣ Get authentication details
+      // 📱 MOBILE → Use google_sign_in
+      final GoogleSignInAccount? googleUser =
+          await _googleSignIn.signIn();
+
+      if (googleUser == null) return null;
+
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
-      // 3️⃣ Create Firebase credential
-      final credential = GoogleAuthProvider.credential(
+      final OAuthCredential credential =
+          GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      // 4️⃣ Sign in to Firebase
-      final UserCredential userCredential = await _auth.signInWithCredential(
-        credential,
-      );
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
 
       return userCredential.user;
     } catch (e) {
-      print("Google Sign-In Error: $e");
+      debugPrint("Google Sign-In Error: $e");
       rethrow;
     }
   }
 
   Future<void> signOut() async {
-    await _googleSignIn.signOut();
+    if (!kIsWeb) {
+      await _googleSignIn.signOut();
+    }
     await _auth.signOut();
   }
 
-  /// 👤 Current user
   User? get currentUser => _auth.currentUser;
 }

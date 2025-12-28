@@ -1,1 +1,36 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"ucbs-attendance-system-4cec1","appId":"1:654699958000:android:3aeeec15c846e88568fc35","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"ucbs-attendance-system-4cec1","configurations":{"android":"1:654699958000:android:3aeeec15c846e88568fc35","web":"1:654699958000:web:fa66cc998b0622a868fc35"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "ucbs-attendance-system-4cec1",
+          "appId": "1:654699958000:android:3aeeec15c846e88568fc35",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "ucbs-attendance-system-4cec1",
+          "configurations": {
+            "android": "1:654699958000:android:3aeeec15c846e88568fc35",
+            "web": "1:654699958000:web:fa66cc998b0622a868fc35"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
