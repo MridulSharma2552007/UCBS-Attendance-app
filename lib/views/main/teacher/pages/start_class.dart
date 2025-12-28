@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:async';
 
 class StartClass extends StatefulWidget {
   final List<Map<String, dynamic>> subjects;
@@ -13,8 +14,26 @@ class StartClass extends StatefulWidget {
 }
 
 class _StartClassState extends State<StartClass> {
+  DateTime? classStartTime;
+  Duration elapsedTime = Duration.zero;
+  Timer? _timer;
   bool isClassLive = false;
   bool showEndButton = false;
+  void startTimer() {
+    _timer?.cancel();
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (classStartTime == null) {
+        timer.cancel();
+        return;
+      }
+
+      setState(() {
+        elapsedTime = DateTime.now().difference(classStartTime!);
+      });
+    });
+  }
+
   Future<void> showEndBtn() async {
     final client = Supabase.instance.client;
     final prefs = await SharedPreferences.getInstance();
@@ -22,22 +41,31 @@ class _StartClassState extends State<StartClass> {
     if (employeeId == null) {
       throw Exception("Employee ID not found In DB");
     }
-    final responseEnd = await client
+    final response = await client
         .from('live_class')
         .select()
         .eq('teacher_id', employeeId)
         .eq('subjectName', subject['name'])
         .eq('is_activated', true)
+        .order('created_at', ascending: false)
+        .limit(1)
         .maybeSingle();
-    if (responseEnd != null) {
+
+    if (response != null) {
+      classStartTime = DateTime.parse(response['created_at']);
+
       setState(() {
         showEndButton = true;
         isClassLive = true;
       });
+
+      startTimer();
     } else {
       setState(() {
         showEndButton = false;
         isClassLive = false;
+        elapsedTime = Duration.zero;
+        classStartTime = null;
       });
     }
   }
@@ -58,6 +86,9 @@ class _StartClassState extends State<StartClass> {
         .eq('subjectName', subject['name']);
     setState(() {
       isClassLive = false;
+      showEndButton = false;
+      elapsedTime = Duration.zero;
+      classStartTime = null;
     });
   }
 
@@ -96,10 +127,22 @@ class _StartClassState extends State<StartClass> {
       'is_activated': true,
       'created_at': DateTime.now().toIso8601String(),
     });
+    classStartTime = DateTime.now();
     setState(() {
       isClassLive = true;
       showEndButton = true;
     });
+    startTimer();
+  }
+
+  String formatDuration(Duration d) {
+    String two(int n) => n.toString().padLeft(2, '0');
+
+    final h = two(d.inHours);
+    final m = two(d.inMinutes.remainder(60));
+    final s = two(d.inSeconds.remainder(60));
+
+    return "$h : $m : $s";
   }
 
   Map<String, dynamic> get subject => widget.subjects.first;
@@ -107,6 +150,12 @@ class _StartClassState extends State<StartClass> {
   void initState() {
     super.initState();
     showEndBtn();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -183,7 +232,7 @@ class _StartClassState extends State<StartClass> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    isClassLive ? 'Class is live' : 'Class not started',
+                    isClassLive ? 'Class is live' : 'Class Inactive',
                     style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
                 ],
@@ -193,7 +242,7 @@ class _StartClassState extends State<StartClass> {
 
               Center(
                 child: Text(
-                  '00 : 00 : 00',
+                  formatDuration(elapsedTime),
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.9),
                     fontSize: 42,
