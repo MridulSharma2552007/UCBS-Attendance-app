@@ -41,7 +41,7 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
         future: _loadTeacher(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: TeacherSkeleton());
           }
           if (snapshot.hasError) {
             return Center(
@@ -475,6 +475,74 @@ class _StartClassSheetState extends State<StartClassSheet> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class TeacherSkeleton extends StatelessWidget {
+  const TeacherSkeleton({super.key});
+
+  Widget skeletonBox({
+    double height = 20,
+    double width = double.infinity,
+    double radius = 12,
+  }) {
+    return Container(
+      height: height,
+      width: width,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(radius),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 50),
+
+          // Header
+          skeletonBox(height: 36, width: 200),
+          const SizedBox(height: 8),
+          skeletonBox(height: 18, width: 140),
+
+          const SizedBox(height: 30),
+
+          skeletonBox(height: 20, width: 120),
+          const SizedBox(height: 10),
+
+          // Subject cards
+          SizedBox(
+            height: 200,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: 3,
+              itemBuilder: (_, __) => Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: skeletonBox(height: 200, width: 300, radius: 18),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+          skeletonBox(height: 20, width: 120),
+          const SizedBox(height: 10),
+
+          // Start class card
+          skeletonBox(height: 200, radius: 20),
+
+          const SizedBox(height: 30),
+          skeletonBox(height: 20, width: 120),
+          const SizedBox(height: 10),
+
+          skeletonBox(height: 200, radius: 20),
+        ],
       ),
     );
   }
