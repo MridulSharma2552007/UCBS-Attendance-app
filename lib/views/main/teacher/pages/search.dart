@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ucbs_attendance_app/colors/colors.dart';
 
 class Search extends StatefulWidget {
@@ -10,6 +11,14 @@ class Search extends StatefulWidget {
 
 class _SearchState extends State<Search> {
   final TextEditingController _searchController = TextEditingController();
+  final client = Supabase.instance.client;
+  Future<void> searchuser() async {
+    final response = await client
+        .from('students')
+        .select()
+        .eq('roll_no', _searchController.text);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +49,7 @@ class _SearchState extends State<Search> {
                 child: Center(
                   child: TextField(
                     controller: _searchController,
-                    onSubmitted: (value) => {},
+                    onSubmitted: (value) => searchuser(),
                     style: TextStyle(color: AppColors.textPrimary),
                     decoration: InputDecoration(
                       hintText: 'Search Student by Roll Number',
