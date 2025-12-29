@@ -11,12 +11,21 @@ class Search extends StatefulWidget {
 
 class _SearchState extends State<Search> {
   final TextEditingController _searchController = TextEditingController();
+  bool isLoading = true;
   final client = Supabase.instance.client;
+  List<Map<String, dynamic>> searchResults = [];
   Future<void> searchuser() async {
+    if (_searchController.text.isEmpty) {
+      return;
+    }
     final response = await client
         .from('students')
         .select()
         .eq('roll_no', _searchController.text);
+    setState(() {
+      searchResults = List<Map<String, dynamic>>.from(response);
+      isLoading = false;
+    });
   }
 
   @override
@@ -38,7 +47,7 @@ class _SearchState extends State<Search> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              padding: const EdgeInsets.only(top: 20.0, bottom: 10),
               child: Container(
                 height: 90,
                 width: double.infinity,
@@ -48,6 +57,7 @@ class _SearchState extends State<Search> {
                 ),
                 child: Center(
                   child: TextField(
+                    keyboardType: TextInputType.number,
                     controller: _searchController,
                     onSubmitted: (value) => searchuser(),
                     style: TextStyle(color: AppColors.textPrimary),
@@ -63,6 +73,69 @@ class _SearchState extends State<Search> {
                   ),
                 ),
               ),
+            ),
+            Expanded(
+              child: isLoading
+                  ? Center(
+                      child: Text(
+                        'No Results',
+                        style: TextStyle(color: AppColors.textSecondary),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: searchResults.length,
+                      itemBuilder: (context, index) {
+                        final student = searchResults[index];
+                        return Container(
+                          height: 100,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: AppColors.bgLightDark,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            children: [
+                              SizedBox(width: 10),
+                              CircleAvatar(
+                                radius: 25,
+                                backgroundColor: AppColors.textPrimary,
+                                child: Text(
+                                  student['name'][0],
+                                  style: TextStyle(
+                                    color: const Color.fromARGB(255, 0, 0, 0),
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 20),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    student['name'],
+                                    style: TextStyle(
+                                      color: AppColors.textPrimary,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    'Roll No: ${student['roll_no']}',
+                                    style: TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),
