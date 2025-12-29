@@ -16,7 +16,7 @@ class _StudentInfoState extends State<StudentInfo> {
       backgroundColor: AppColors.bgDark,
       body: Center(
         child: Text(
-          'Student Info Page\nData: ${widget.studentData[0]['name']}',
+          'Student : ${widget.studentData[0]['name']}',
           style: TextStyle(color: AppColors.textPrimary, fontSize: 20),
           textAlign: TextAlign.center,
         ),
