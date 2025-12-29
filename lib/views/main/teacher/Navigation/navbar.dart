@@ -8,7 +8,7 @@ class Navbar extends StatelessWidget {
 
   final items = [
     Icons.home_rounded,
-    
+
     Icons.search_rounded,
     Icons.bar_chart_rounded,
     Icons.person,
