@@ -108,18 +108,33 @@ class ClassInfo extends StatefulWidget {
 }
 
 class _ClassInfoState extends State<ClassInfo> {
+  @override
+  void initState() {
+    super.initState();
+    fetchClassInfo();
+  }
+
   List<Map<String, dynamic>> classes = [];
   bool isLoading = true;
   Future<void> fetchClassInfo() async {
-    final List<Map<String, dynamic>> response = await widget.client
-        .from('live_class')
-        .select()
-        .eq('is_activated', true);
-    if (!mounted) return;
-    setState(() {
-      classes = response;
-      isLoading = false;
-    });
+    try {
+      final response = await widget.client
+          .from('live_class')
+          .select()
+          .eq('is_activated', true);
+      print("LIVE CLASS RESPONSE: $response");
+
+      if (!mounted) return;
+
+      setState(() {
+        classes = List<Map<String, dynamic>>.from(response);
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint("Class fetch error: $e");
+      if (!mounted) return;
+      setState(() => isLoading = false);
+    }
   }
 
   @override
@@ -148,41 +163,32 @@ class _ClassInfoState extends State<ClassInfo> {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 120),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.cardDark,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: classes.length,
-          itemBuilder: (context, index) {
-            final classInfo = classes[index];
-
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  classInfo['subjectName'],
-                  style: GoogleFonts.dmSans(
-                    color: AppColors.textPrimary,
-                    fontSize: 18,
-                  ),
-                ),
-                subtitle: Text(
-                  'Semester ${classInfo['sem']}',
-                  style: GoogleFonts.dmSans(
-                    color: AppColors.textSecondary,
-                    fontSize: 14,
-                  ),
+      child: Column(
+        children: classes.map((cls) {
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.cardDark,
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                "🟢 ${cls['subjectName']}",
+                style: GoogleFonts.dmSans(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-            );
-          },
-        ),
+              subtitle: Text(
+                "Semester: ${cls['sem']}",
+                style: GoogleFonts.dmSans(color: Colors.white60),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
