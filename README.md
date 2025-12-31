@@ -71,11 +71,11 @@ Basically:
 
 ## 🧪 Current Progress
 
-- UI = ✔ **40%**
+- UI = ✔ **70%**
 - Face scanning = ✔ **basic**
-- AI detection = **WIP**
-- Database flow = **WIP**
-- Stress levels = ✔✔✔ **high**
+- AI detection = **Completed**
+- Database flow = **Completed**
+- Stress levels = ✔✔✔ **low**
 
 ---
 
