@@ -90,6 +90,9 @@ class _StartClassState extends State<StartClass> {
       elapsedTime = Duration.zero;
       classStartTime = null;
     });
+    
+    // Navigate back and refresh the main page
+    Navigator.pop(context, true);
   }
 
   Future<void> StartClass() async {
@@ -142,7 +145,7 @@ class _StartClassState extends State<StartClass> {
     final m = two(d.inMinutes.remainder(60));
     final s = two(d.inSeconds.remainder(60));
 
-    return "$h : $m : $s";
+    return "$h:$m:$s";
   }
 
   Map<String, dynamic> get subject => widget.subjects.first;
@@ -181,7 +184,7 @@ class _StartClassState extends State<StartClass> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.close, color: Colors.white70),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => Navigator.pop(context, true),
                   ),
                 ],
               ),
@@ -190,28 +193,101 @@ class _StartClassState extends State<StartClass> {
 
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF1A1A1A),
+                      const Color(0xFF2A2A2A),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      subject['name'],
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500,
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.book,
+                            color: Colors.blue,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                subject['name'],
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Semester ${subject['sem']}',
+                                style: const TextStyle(
+                                  color: Colors.white60,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 40),
+
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: isClassLive 
+                    ? Colors.green.withOpacity(0.1)
+                    : Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isClassLive 
+                      ? Colors.green.withOpacity(0.3)
+                      : Colors.red.withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: isClassLive ? Colors.green : Colors.red,
+                        shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(width: 12),
                     Text(
-                      'Semester ${subject['sem']}',
-                      style: const TextStyle(
-                        color: Colors.white60,
-                        fontSize: 15,
+                      isClassLive ? 'Class is Live' : 'Class Inactive',
+                      style: TextStyle(
+                        color: isClassLive ? Colors.green : Colors.red,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
@@ -220,105 +296,152 @@ class _StartClassState extends State<StartClass> {
 
               const SizedBox(height: 40),
 
-              Row(
-                children: [
-                  Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: isClassLive ? Colors.green : Colors.red,
-                      shape: BoxShape.circle,
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(32),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A1A1A),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.1),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'Duration',
+                      style: TextStyle(
+                        color: Colors.white60,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    isClassLive ? 'Class is live' : 'Class Inactive',
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 30),
-
-              Center(
-                child: Text(
-                  formatDuration(elapsedTime),
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 42,
-                    fontWeight: FontWeight.w300,
-                    letterSpacing: 2,
-                  ),
+                    const SizedBox(height: 8),
+                    Text(
+                      formatDuration(elapsedTime),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 48,
+                        fontWeight: FontWeight.w300,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
               const Spacer(),
+              
               if (!isClassLive)
-                GestureDetector(
-                  onTap: () {
-                    StartClass();
-                  },
-                  child: Container(
-                    height: 60,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.greenAccent,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: Colors.green.withOpacity(0.4)),
+                Container(
+                  height: 60,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.green, Colors.greenAccent],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
                     ),
-                    child: const Center(
-                      child: Text(
-                        'Start Class',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.green.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(18),
+                      onTap: StartClass,
+                      child: const Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.play_arrow,
+                              color: Colors.black,
+                              size: 24,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              'Start Class',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
                 ),
-              SizedBox(height: 20),
+              
+              const SizedBox(height: 16),
 
-              Container(
-                child: showEndButton && isClassLive
-                    ? GestureDetector(
-                        onTap: () {
-                          EndClass();
-                        },
-                        child: Container(
-                          height: 60,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF1F1F1F),
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(
-                              color: Colors.redAccent.withOpacity(0.4),
+              if (showEndButton && isClassLive)
+                Container(
+                  height: 60,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1F1F1F),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: Colors.redAccent.withOpacity(0.4),
+                    ),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(18),
+                      onTap: EndClass,
+                      child: const Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.stop,
+                              color: Colors.redAccent,
+                              size: 24,
                             ),
-                          ),
-                          child: Center(
-                            child: Text(
+                            SizedBox(width: 8),
+                            Text(
                               'End Class',
                               style: TextStyle(
                                 color: Colors.redAccent,
                                 fontSize: 18,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ),
-                        ),
-                      )
-                    : Center(
-                        child: Text(
-                          'Start a class first , or close existing live class ',
-                          style: TextStyle(
-                            color: Colors.white38,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          ],
                         ),
                       ),
-              ),
+                    ),
+                  ),
+                )
+              else if (!isClassLive)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Start a class to begin attendance tracking',
+                      style: TextStyle(
+                        color: Colors.white60,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

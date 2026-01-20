@@ -18,6 +18,8 @@ class TeacherMainpage extends StatefulWidget {
 
 class _TeacherMainpageState extends State<TeacherMainpage> {
   final client = Supabase.instance.client;
+  final GlobalKey<_ClassInfoState> _classInfoKey = GlobalKey<_ClassInfoState>();
+
   Future<Map<String, dynamic>> _loadTeacher() async {
     final prefs = await SharedPreferences.getInstance();
     final employeeId = prefs.getInt('employee_id');
@@ -31,6 +33,10 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
         .eq('employee_id', employeeId)
         .single();
     return data;
+  }
+
+  void _refreshClassInfo() {
+    _classInfoKey.currentState?.fetchClassInfo();
   }
 
   @override
@@ -62,35 +68,99 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
               children: [
                 const SizedBox(height: 50),
                 Header(teacher: teacher),
-                Text(
-                  'Your Subjects',
-                  style: GoogleFonts.dmSans(
-                    fontSize: 20,
-                    color: AppColors.textSecondary,
-                  ),
+
+                const SizedBox(height: 32),
+
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.book_outlined,
+                        color: Colors.blue,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Your Subjects',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 16),
                 SubjectCard(subjects: subjects),
-                SizedBox(height: 10),
-                Text(
-                  'Start a Class',
-                  style: GoogleFonts.dmSans(
-                    color: AppColors.textSecondary,
-                    fontSize: 20,
-                  ),
+
+                const SizedBox(height: 32),
+
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.play_circle_outline,
+                        color: Colors.green,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Quick Actions',
+                      style: GoogleFonts.dmSans(
+                        color: AppColors.textPrimary,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 10),
-                StartClassWidget(subjects: subjects),
-                const SizedBox(height: 30),
-                Text(
-                  'Live Classes',
-                  style: GoogleFonts.dmSans(
-                    color: AppColors.textSecondary,
-                    fontSize: 20,
-                  ),
+                const SizedBox(height: 16),
+                StartClassWidget(
+                  subjects: subjects,
+                  onClassUpdate: _refreshClassInfo,
                 ),
-                SizedBox(height: 10),
-                ClassInfo(client: client),
+
+                const SizedBox(height: 32),
+
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.live_tv,
+                        color: Colors.red,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Live Classes',
+                      style: GoogleFonts.dmSans(
+                        color: AppColors.textPrimary,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                ClassInfo(client: client, key: _classInfoKey),
               ],
             ),
           );
@@ -141,23 +211,58 @@ class _ClassInfoState extends State<ClassInfo> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return Padding(
-        padding: const EdgeInsets.all(120),
-        child: Center(
-          child: CircularProgressIndicator(color: AppColors.accentBlue),
+      return Container(
+        height: 120,
+        decoration: BoxDecoration(
+          color: AppColors.cardDark,
+          borderRadius: BorderRadius.circular(16),
         ),
+        child: Center(child: CircularProgressIndicator(color: Colors.blue)),
       );
     }
 
     if (classes.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 120),
-        child: Text(
-          "No active classes at the moment.",
-          style: GoogleFonts.dmSans(
-            color: AppColors.textSecondary,
-            fontSize: 16,
-          ),
+      return Container(
+        padding: const EdgeInsets.all(24),
+        margin: const EdgeInsets.only(bottom: 120),
+        decoration: BoxDecoration(
+          color: AppColors.cardDark,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withOpacity(0.1)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.tv_off,
+                size: 32,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "No Active Classes",
+              style: GoogleFonts.dmSans(
+                color: AppColors.textPrimary,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Start a class to see it appear here",
+              style: GoogleFonts.dmSans(
+                color: AppColors.textSecondary,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       );
     }
@@ -168,25 +273,76 @@ class _ClassInfoState extends State<ClassInfo> {
         children: classes.map((cls) {
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AppColors.cardDark,
-              borderRadius: BorderRadius.circular(18),
+              gradient: LinearGradient(
+                colors: [
+                  Colors.red.withOpacity(0.1),
+                  Colors.red.withOpacity(0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.red.withOpacity(0.2)),
             ),
-            child: ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(
-                "🟢 ${cls['subjectName']}",
-                style: GoogleFonts.dmSans(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.live_tv, color: Colors.red, size: 20),
                 ),
-              ),
-              subtitle: Text(
-                "Semester: ${cls['sem']}",
-                style: GoogleFonts.dmSans(color: Colors.white60),
-              ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            "LIVE",
+                            style: GoogleFonts.dmSans(
+                              color: Colors.red,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        cls['subjectName'],
+                        style: GoogleFonts.dmSans(
+                          color: AppColors.textPrimary,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        "Semester ${cls['sem']}",
+                        style: GoogleFonts.dmSans(
+                          color: AppColors.textSecondary,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.radio_button_checked, color: Colors.red, size: 20),
+              ],
             ),
           );
         }).toList(),
@@ -197,77 +353,119 @@ class _ClassInfoState extends State<ClassInfo> {
 
 class StartClassWidget extends StatelessWidget {
   final List<Map<String, dynamic>> subjects;
-  const StartClassWidget({super.key, required this.subjects});
+  final VoidCallback? onClassUpdate;
+  const StartClassWidget({
+    super.key,
+    required this.subjects,
+    this.onClassUpdate,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 220,
-      margin: const EdgeInsets.only(bottom: 20),
-      width: 300,
+      height: 200,
+      width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.cardDark,
-
+        gradient: LinearGradient(
+          colors: [AppColors.cardDark, AppColors.cardDark.withOpacity(0.8)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 10),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.play_circle_fill,
+                    color: Colors.green,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Start Class',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
             Text(
-              'Quick Actions',
+              'Select a subject to begin attendance tracking',
               style: GoogleFonts.dmSans(
-                fontSize: 18,
+                fontSize: 14,
                 color: AppColors.textSecondary,
               ),
             ),
-            Text(
-              'Start Class',
-              style: GoogleFonts.dmSans(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            Text(
-              'Select a subject and all students will be notifies',
-              style: GoogleFonts.dmSans(
-                fontSize: 18,
-
-                color: AppColors.textPrimary,
-              ),
-            ),
-            Spacer(),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Spacer(),
-                  ElevatedButton(
+            const Spacer(),
+            Row(
+              children: [
+                const Spacer(),
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Colors.green, Colors.greenAccent],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: AppColors.bgDark,
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: Colors.black,
+                      elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       HapticFeedback.mediumImpact();
 
-                      showModalBottomSheet(
+                      final result = await showModalBottomSheet<bool>(
                         context: context,
                         backgroundColor: Colors.transparent,
                         isScrollControlled: true,
                         builder: (_) => StartClassSheet(subjects: subjects),
                       );
-                    },
 
-                    child: const Text("Start"),
+                      if (result == true && onClassUpdate != null) {
+                        onClassUpdate!();
+                      }
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.play_arrow, size: 18),
+                        const SizedBox(width: 8),
+                        Text(
+                          "Start",
+                          style: GoogleFonts.dmSans(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
@@ -284,46 +482,78 @@ class SubjectCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 200,
+      height: 160,
       child: ListView.builder(
         itemCount: subjects.length,
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Container(
-              height: 200,
-              width: 300,
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color: AppColors.cardDark,
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(width: 6),
-                    Text("📑", style: TextStyle(fontSize: 16)),
-                    Text(
-                      subjects[index]['name'],
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+          final colors = [
+            [Colors.blue.withOpacity(0.1), Colors.blue.withOpacity(0.05)],
+            [Colors.purple.withOpacity(0.1), Colors.purple.withOpacity(0.05)],
+            [Colors.orange.withOpacity(0.1), Colors.orange.withOpacity(0.05)],
+            [Colors.teal.withOpacity(0.1), Colors.teal.withOpacity(0.05)],
+          ];
+          final colorPair = colors[index % colors.length];
+          final iconColors = [Colors.blue, Colors.purple, Colors.orange, Colors.teal];
+          final iconColor = iconColors[index % iconColors.length];
 
-                    Text(
-                      'Semester: ${subjects[index]['sem']}',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
-                      ),
+          return Container(
+            width: 260,
+            margin: const EdgeInsets.only(right: 16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: colorPair,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: iconColor.withOpacity(0.2)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: iconColor.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  ],
-                ),
+                    child: Icon(
+                      Icons.book,
+                      color: iconColor,
+                      size: 20,
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          subjects[index]['name'],
+                          style: GoogleFonts.dmSans(
+                            color: AppColors.textPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Semester ${subjects[index]['sem']}',
+                          style: GoogleFonts.dmSans(
+                            color: AppColors.textSecondary,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           );
@@ -533,13 +763,20 @@ class _StartClassSheetState extends State<StartClassSheet> {
                           color: AppColors.textSecondary,
                           size: 16,
                         ),
-                        onTap: () {
+                        onTap: () async {
+                          if (!mounted) return;
+                          
                           final subject = widget.subjects[index];
 
                           print(
                             'Selected subject: ${subject['name']} | Semester: ${subject['sem']}',
                           );
-                          Navigator.push(
+
+                          Navigator.pop(context); // Close the bottom sheet first
+
+                          if (!mounted) return;
+                          
+                          final result = await Navigator.push<bool>(
                             context,
                             MaterialPageRoute(
                               builder: (context) => StartClass(
@@ -552,6 +789,11 @@ class _StartClassSheetState extends State<StartClassSheet> {
                               ),
                             ),
                           );
+
+                          // Return the result to the parent
+                          if (mounted && result == true) {
+                            Navigator.pop(context, true);
+                          }
                         },
                       );
                     },
