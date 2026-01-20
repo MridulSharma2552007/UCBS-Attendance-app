@@ -12,13 +12,41 @@ class Search extends StatefulWidget {
   State<Search> createState() => _SearchState();
 }
 
-class _SearchState extends State<Search> {
+class _SearchState extends State<Search> with TickerProviderStateMixin {
   final PageController _pageController = PageController();
   final TextEditingController _searchController = TextEditingController();
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+  
   bool isLoading = false;
   bool hasSearched = false;
   final client = Supabase.instance.client;
   List<Map<String, dynamic>> searchResults = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
+    
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
   
   Future<void> searchuser() async {
     if (_searchController.text.isEmpty) {
@@ -51,6 +79,8 @@ class _SearchState extends State<Search> {
         SnackBar(
           content: Text('Error searching student: $e'),
           backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       );
     }
@@ -60,150 +90,263 @@ class _SearchState extends State<Search> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgDark,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: PageView(
-          controller: _pageController,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 60),
-                
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.search,
-                        color: Colors.blue,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Search Student',
-                            style: GoogleFonts.dmSans(
-                              color: AppColors.textPrimary,
-                              fontSize: 28,
-                              fontWeight: FontWeight.w700,
-                            ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.topRight,
+            radius: 1.5,
+            colors: [
+              Colors.blue.withOpacity(0.03),
+              AppColors.bgDark,
+              AppColors.bgDark,
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: PageView(
+            controller: _pageController,
+            children: [
+              FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 60),
+                      
+                      // Creative Header
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.blue.withOpacity(0.1),
+                              Colors.purple.withOpacity(0.05),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
-                          Text(
-                            'Find student by roll number',
-                            style: GoogleFonts.dmSans(
-                              color: AppColors.textSecondary,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                
-                const SizedBox(height: 32),
-                
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.cardDark,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.1),
-                    ),
-                  ),
-                  child: TextField(
-                    keyboardType: TextInputType.number,
-                    controller: _searchController,
-                    onSubmitted: (value) => searchuser(),
-                    style: GoogleFonts.dmSans(
-                      color: AppColors.textPrimary,
-                      fontSize: 16,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'Enter roll number...',
-                      hintStyle: GoogleFonts.dmSans(
-                        color: AppColors.textSecondary,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(20),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: AppColors.textSecondary,
-                      ),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: Icon(
-                                Icons.clear,
-                                color: AppColors.textSecondary,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.blue.withOpacity(0.2)),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Colors.blue, Colors.blueAccent],
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.blue.withOpacity(0.3),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                               ),
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() {
-                                  searchResults = [];
-                                  hasSearched = false;
-                                });
-                              },
-                            )
-                          : null,
-                    ),
-                    onChanged: (value) {
-                      setState(() {});
-                    },
-                  ),
-                ),
-                
-                const SizedBox(height: 16),
-                
-                Container(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                    onPressed: isLoading ? null : searchuser,
-                    child: isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              child: const Icon(
+                                Icons.search_rounded,
+                                color: Colors.white,
+                                size: 28,
+                              ),
                             ),
-                          )
-                        : Text(
-                            'Search Student',
-                            style: GoogleFonts.dmSans(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                            const SizedBox(width: 20),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Student Finder',
+                                    style: GoogleFonts.inter(
+                                      color: AppColors.textPrimary,
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: -0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Discover student profiles instantly',
+                                    style: GoogleFonts.inter(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 32),
+                      
+                      // Modern Search Bar
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.15),
                             ),
                           ),
+                          child: TextField(
+                            keyboardType: TextInputType.number,
+                            controller: _searchController,
+                            onSubmitted: (value) => searchuser(),
+                            style: GoogleFonts.inter(
+                              color: AppColors.textPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: 'Enter roll number...',
+                              hintStyle: GoogleFonts.inter(
+                                color: AppColors.textSecondary.withOpacity(0.7),
+                                fontSize: 16,
+                              ),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.all(24),
+                              prefixIcon: Container(
+                                margin: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  Icons.numbers_rounded,
+                                  color: Colors.blue,
+                                  size: 20,
+                                ),
+                              ),
+                              suffixIcon: _searchController.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: Container(
+                                        padding: const EdgeInsets.all(4),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: const Icon(
+                                          Icons.close_rounded,
+                                          color: Colors.red,
+                                          size: 16,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        _searchController.clear();
+                                        setState(() {
+                                          searchResults = [];
+                                          hasSearched = false;
+                                        });
+                                      },
+                                    )
+                                  : null,
+                            ),
+                            onChanged: (value) {
+                              setState(() {});
+                            },
+                          ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 20),
+                      
+                      // Animated Search Button
+                      Container(
+                        width: double.infinity,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Colors.blue, Colors.blueAccent],
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.blue.withOpacity(0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          onPressed: isLoading ? null : searchuser,
+                          child: isLoading
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Searching...',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.search_rounded, size: 20),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Find Student',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 32),
+                      
+                      Expanded(
+                        child: _buildSearchResults(),
+                      ),
+                    ],
                   ),
                 ),
-                
-                const SizedBox(height: 32),
-                
-                Expanded(
-                  child: _buildSearchResults(),
-                ),
-              ],
-            ),
-            StudentInfo(studentData: searchResults),
-          ],
+              ),
+              StudentInfo(studentData: searchResults),
+            ],
+          ),
         ),
       ),
     );
@@ -216,32 +359,45 @@ class _SearchState extends State<Search> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.1),
+                gradient: RadialGradient(
+                  colors: [
+                    Colors.blue.withOpacity(0.1),
+                    Colors.transparent,
+                  ],
+                ),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.search,
-                size: 48,
-                color: AppColors.textSecondary,
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.person_search_rounded,
+                  size: 64,
+                  color: Colors.blue.withOpacity(0.7),
+                ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             Text(
-              'Search for a student',
-              style: GoogleFonts.dmSans(
-                color: AppColors.textSecondary,
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
+              'Ready to Search',
+              style: GoogleFonts.inter(
+                color: AppColors.textPrimary,
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Enter a roll number to find student details',
-              style: GoogleFonts.dmSans(
-                color: AppColors.textSecondary.withOpacity(0.7),
-                fontSize: 14,
+              'Enter a roll number above to discover\nstudent profiles and analytics',
+              style: GoogleFonts.inter(
+                color: AppColors.textSecondary,
+                fontSize: 16,
+                height: 1.5,
               ),
               textAlign: TextAlign.center,
             ),
@@ -251,8 +407,32 @@ class _SearchState extends State<Search> {
     }
     
     if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: Colors.blue),
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const CircularProgressIndicator(
+                color: Colors.blue,
+                strokeWidth: 3,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Searching...',
+              style: GoogleFonts.inter(
+                color: AppColors.textPrimary,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       );
     }
     
@@ -262,32 +442,45 @@ class _SearchState extends State<Search> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                gradient: RadialGradient(
+                  colors: [
+                    Colors.red.withOpacity(0.1),
+                    Colors.transparent,
+                  ],
+                ),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.person_off,
-                size: 48,
-                color: Colors.red,
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.person_off_rounded,
+                  size: 64,
+                  color: Colors.red,
+                ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             Text(
-              'No student found',
-              style: GoogleFonts.dmSans(
+              'Student Not Found',
+              style: GoogleFonts.inter(
                 color: AppColors.textPrimary,
-                fontSize: 18,
+                fontSize: 24,
                 fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'No student with roll number "${_searchController.text}" was found',
-              style: GoogleFonts.dmSans(
+              'No student with roll number\n"${_searchController.text}" exists in our records',
+              style: GoogleFonts.inter(
                 color: AppColors.textSecondary,
-                fontSize: 14,
+                fontSize: 16,
+                height: 1.5,
               ),
               textAlign: TextAlign.center,
             ),
@@ -303,90 +496,132 @@ class _SearchState extends State<Search> {
         return Container(
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
-            color: AppColors.cardDark,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.1),
-            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () {
-                HapticFeedback.lightImpact();
-                _pageController.animateToPage(
-                  1,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.blue,
-                            Colors.blue.shade300,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.white.withOpacity(0.1),
+                  Colors.white.withOpacity(0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.15),
+              ),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  _pageController.animateToPage(
+                    1,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut,
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 70,
+                        height: 70,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.blue,
+                              Colors.blueAccent,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.blue.withOpacity(0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
                           ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Center(
-                        child: Text(
-                          student['name'][0].toString().toUpperCase(),
-                          style: GoogleFonts.dmSans(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w700,
+                        child: Center(
+                          child: Text(
+                            student['name'][0].toString().toUpperCase(),
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontSize: 28,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            student['name'],
-                            style: GoogleFonts.dmSans(
-                              color: AppColors.textPrimary,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              student['name'],
+                              style: GoogleFonts.inter(
+                                color: AppColors.textPrimary,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Roll No: ${student['roll_no']}',
-                            style: GoogleFonts.dmSans(
-                              color: AppColors.textSecondary,
-                              fontSize: 14,
+                            const SizedBox(height: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'Roll ${student['roll_no']}',
+                                style: GoogleFonts.inter(
+                                  color: Colors.blue,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                             ),
-                          ),
-                          Text(
-                            'Semester ${student['semester']}',
-                            style: GoogleFonts.dmSans(
-                              color: AppColors.textSecondary,
-                              fontSize: 14,
+                            const SizedBox(height: 4),
+                            Text(
+                              'Semester ${student['semester']}',
+                              style: GoogleFonts.inter(
+                                color: AppColors.textSecondary,
+                                fontSize: 14,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: AppColors.textSecondary,
-                      size: 16,
-                    ),
-                  ],
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          color: Colors.blue,
+                          size: 16,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -19,6 +19,7 @@ class _StartClassState extends State<StartClass> {
   Timer? _timer;
   bool isClassLive = false;
   bool showEndButton = false;
+  bool isLoadingTime = true;
   void startTimer() {
     _timer?.cancel();
 
@@ -52,11 +53,12 @@ class _StartClassState extends State<StartClass> {
         .maybeSingle();
 
     if (response != null) {
-      classStartTime = DateTime.parse(response['created_at']);
+      classStartTime = DateTime.parse(response['created_at']).toLocal();
 
       setState(() {
         showEndButton = true;
         isClassLive = true;
+        isLoadingTime = false;
       });
 
       startTimer();
@@ -66,6 +68,7 @@ class _StartClassState extends State<StartClass> {
         isClassLive = false;
         elapsedTime = Duration.zero;
         classStartTime = null;
+        isLoadingTime = false;
       });
     }
   }
@@ -128,17 +131,21 @@ class _StartClassState extends State<StartClass> {
       'subjectName': subject['name'],
       'sem': subject['sem'],
       'is_activated': true,
-      'created_at': DateTime.now().toIso8601String(),
     });
     classStartTime = DateTime.now();
     setState(() {
       isClassLive = true;
       showEndButton = true;
+      isLoadingTime = false;
     });
     startTimer();
   }
 
   String formatDuration(Duration d) {
+    if (d.isNegative) {
+      d = d.abs();
+    }
+    
     String two(int n) => n.toString().padLeft(2, '0');
 
     final h = two(d.inHours);
@@ -317,15 +324,38 @@ class _StartClassState extends State<StartClass> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      formatDuration(elapsedTime),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 48,
-                        fontWeight: FontWeight.w300,
-                        letterSpacing: 2,
-                      ),
-                    ),
+                    isLoadingTime
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white60),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                'Calculating time...',
+                                style: TextStyle(
+                                  color: Colors.white60,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            formatDuration(elapsedTime),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 48,
+                              fontWeight: FontWeight.w300,
+                              letterSpacing: 2,
+                            ),
+                          ),
                   ],
                 ),
               ),
