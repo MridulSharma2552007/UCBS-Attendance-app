@@ -77,7 +77,10 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.accentyellow,
                           borderRadius: BorderRadius.circular(22),
@@ -114,7 +117,7 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Header
                   Header(teacher: teacher),
                   const SizedBox(height: 40),
@@ -129,11 +132,7 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  SubjectCard(subjects: subjects),
-                  const SizedBox(height: 40),
-
-                  // Quick Start
-                  StartClassWidget(
+                  SubjectCard(
                     subjects: subjects,
                     onClassUpdate: _refreshClassInfo,
                   ),
@@ -271,8 +270,9 @@ class _HeaderState extends State<Header> {
 }
 
 class SubjectCard extends StatelessWidget {
-  const SubjectCard({super.key, required this.subjects});
+  const SubjectCard({super.key, required this.subjects, this.onClassUpdate});
   final List<Map<String, dynamic>> subjects;
+  final VoidCallback? onClassUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -300,7 +300,6 @@ class SubjectCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Subject title
               Text(
                 subject['name'],
                 style: GoogleFonts.inter(
@@ -334,94 +333,52 @@ class SubjectCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(width: 20),
+                  const Spacer(),
+                  ElevatedButton(
+                    onPressed: () async {
+                      HapticFeedback.lightImpact();
+
+                      final result = await Navigator.push<bool>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => StartClass(
+                            subjects: [
+                              {"name": subject['name'], "sem": subject['sem']},
+                            ],
+                          ),
+                        ),
+                      );
+
+                      if (result == true && onClassUpdate != null) {
+                        onClassUpdate!();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                    ),
+                    child: Text(
+                      'START',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 20),
             ],
           ),
         );
       }).toList(),
-    );
-  }
-}
-
-class StartClassWidget extends StatelessWidget {
-  final List<Map<String, dynamic>> subjects;
-  final VoidCallback? onClassUpdate;
-
-  const StartClassWidget({
-    super.key,
-    required this.subjects,
-    this.onClassUpdate,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Start Class',
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'Begin attendance tracking for your subjects',
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: AppColors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
-              onPressed: () async {
-                HapticFeedback.lightImpact();
-
-                final result = await showModalBottomSheet<bool>(
-                  context: context,
-                  backgroundColor: Colors.transparent,
-                  isScrollControlled: true,
-                  builder: (_) => StartClassSheet(subjects: subjects),
-                );
-
-                if (result == true && onClassUpdate != null) {
-                  onClassUpdate!();
-                }
-              },
-              child: Text(
-                "Start Class",
-                style: GoogleFonts.inter(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -468,10 +425,11 @@ class _ClassInfoState extends State<ClassInfo> {
   Widget build(BuildContext context) {
     if (isLoading) {
       return Container(
-        height: 100,
+        height: 120,
+        width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.06),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(32),
         ),
         child: const Center(
           child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
@@ -481,34 +439,29 @@ class _ClassInfoState extends State<ClassInfo> {
 
     if (classes.isEmpty) {
       return Container(
+        height: 120,
+        width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.06),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(32),
         ),
         child: Center(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 Icons.tv_off_outlined,
-                size: 32,
+                size: 24,
                 color: AppColors.textSecondary,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Text(
                 "No active classes",
                 style: GoogleFonts.inter(
                   color: AppColors.textPrimary,
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                "Start a class to see it here",
-                style: GoogleFonts.inter(
-                  color: AppColors.textSecondary,
-                  fontSize: 13,
                 ),
               ),
             ],
@@ -519,53 +472,67 @@ class _ClassInfoState extends State<ClassInfo> {
 
     return Column(
       children: classes.map((cls) {
+        final index = classes.indexOf(cls);
+        final colors = [
+          Color(0xFFD4E87B),
+          Color(0xFFFFD25F),
+          Color(0xFFFF7562),
+          Color(0xFF87CEEB),
+          Color(0xFFDDA0DD),
+        ];
+        final bgColor = colors[index % colors.length];
+
         return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(20),
+          width: double.infinity,
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.06),
-            borderRadius: BorderRadius.circular(16),
+            color: bgColor,
+            borderRadius: BorderRadius.circular(32),
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      cls['subjectName'],
-                      style: GoogleFonts.inter(
-                        color: AppColors.textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+              Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
                     ),
-                    Text(
-                      "Semester ${cls['sem']} • Live",
-                      style: GoogleFonts.inter(
-                        color: AppColors.textSecondary,
-                        fontSize: 13,
-                      ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'LIVE',
+                    style: GoogleFonts.inter(
+                      color: Colors.black,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+              const SizedBox(height: 16),
               Text(
-                "LIVE",
+                cls['subjectName'],
                 style: GoogleFonts.inter(
-                  color: Colors.red,
-                  fontSize: 11,
+                  color: Colors.black,
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Semester ${cls['sem']}',
+                style: GoogleFonts.inter(
+                  color: Colors.black.withOpacity(0.8),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
