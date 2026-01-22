@@ -8,7 +8,6 @@ class Navbar extends StatelessWidget {
 
   final items = [
     Icons.home_rounded,
-
     Icons.search_rounded,
     Icons.bar_chart_rounded,
     Icons.person,
@@ -17,13 +16,13 @@ class Navbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 100,
+      height: 70,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(50),
         color: AppColors.bgLightDark,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: List.generate(items.length, (index) {
           final isActive = index == currentIndex;
           return GestureDetector(
@@ -32,17 +31,15 @@ class Navbar extends StatelessWidget {
               duration: const Duration(milliseconds: 250),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isActive
-                    ? AppColors.accentBlue.withOpacity(0.25)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(14),
+                color: isActive ? AppColors.accentyellow : Colors.transparent,
+                borderRadius: BorderRadius.circular(50),
               ),
               child: Icon(
                 items[index],
                 size: 26,
 
                 color: isActive
-                    ? AppColors.textPrimary
+                    ? AppColors.bgLightDark
                     : AppColors.textSecondary,
               ),
             ),

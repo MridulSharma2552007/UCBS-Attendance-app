@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Base Dark Backgrounds
-  static const Color bgDark = Color(0xFF0F0F0F); // true dark
+  static const Color bgDark = Color.fromARGB(255, 0, 0, 0); // true dark
   static const Color bgLightDark = Color(
     0xFF181818,
   ); // slightly raised surfaces
@@ -19,7 +19,7 @@ class AppColors {
   static const Color accentTeal = Color(0xFF2DD4BF); // mint-teal glow
   static const Color accentOrange = Color(0xFFFFA559); // aesthetic warm orange
   static const Color accentPink = Color(0xFFFF6EA1); // soft pink glow
-
+  static const Color accentyellow = Color(0xFFFFD25F);
   // Borders / Hairlines
   static const Color divider = Color(0xFF2A2A2A);
 
