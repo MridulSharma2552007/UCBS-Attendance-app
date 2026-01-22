@@ -72,6 +72,49 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Top row with Add Class button and profile
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: AppColors.accentyellow,
+                          borderRadius: BorderRadius.circular(22),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.add, color: Colors.black, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Add Class',
+                              style: GoogleFonts.inter(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Icons.person_outline,
+                          size: 24,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  
                   // Header
                   Header(teacher: teacher),
                   const SizedBox(height: 40),
@@ -144,7 +187,7 @@ class _HeaderState extends State<Header> {
   void initState() {
     super.initState();
     today = DateTime.now();
-    weekdays = List.generate(7, (i) => today.add(Duration(days: i - 3)));
+    weekdays = List.generate(7, (i) => today.add(Duration(days: i - 2)));
   }
 
   @override
@@ -152,44 +195,24 @@ class _HeaderState extends State<Header> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Greeting
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        // Title with emoji
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.teacher['name'],
-                    style: GoogleFonts.inter(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    getGreeting(),
-                    style: GoogleFonts.inter(
-                      color: AppColors.textSecondary,
-                      fontSize: 15,
-                    ),
-                  ),
-                ],
+            Text(
+              'Hi 👋 ${widget.teacher['name']}',
+              style: GoogleFonts.inter(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
               ),
             ),
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.person_outline,
-                size: 24,
+            const SizedBox(height: 2),
+            Text(
+              getGreeting(),
+              style: GoogleFonts.inter(
                 color: AppColors.textSecondary,
+                fontSize: 15,
               ),
             ),
           ],
@@ -197,7 +220,6 @@ class _HeaderState extends State<Header> {
 
         const SizedBox(height: 24),
 
-        // Date Selector
         SizedBox(
           height: 70,
           child: ListView.builder(
@@ -208,13 +230,14 @@ class _HeaderState extends State<Header> {
               final isToday = isSameDay(date, today);
 
               return Container(
-                width: 50,
+                width: 100,
+                height: 20,
                 margin: const EdgeInsets.only(right: 12),
                 decoration: BoxDecoration(
                   color: isToday
-                      ? Colors.white
+                      ? AppColors.accentyellow
                       : Colors.white.withOpacity(0.06),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(22),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -253,46 +276,72 @@ class SubjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 120,
-      child: ListView.builder(
-        itemCount: subjects.length,
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) {
-          return Container(
-            width: 200,
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.06),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  subjects[index]['name'],
-                  style: GoogleFonts.inter(
-                    color: AppColors.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+    return Column(
+      children: subjects.map((subject) {
+        final index = subjects.indexOf(subject);
+        final colors = [
+          Color(0xFFD4E87B),
+          Color(0xFFFFD25F),
+          Color(0xFFFF7562),
+          Color(0xFF87CEEB),
+          Color(0xFFDDA0DD),
+        ];
+        final bgColor = colors[index % colors.length];
+
+        return Container(
+          height: 180,
+          width: double.infinity,
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(32),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Subject title
+              Text(
+                subject['name'],
+                style: GoogleFonts.inter(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  height: 1.2,
                 ),
-                const Spacer(),
-                Text(
-                  'Semester ${subjects[index]['sem']}',
-                  style: GoogleFonts.inter(
-                    color: AppColors.textSecondary,
-                    fontSize: 13,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 16),
+
+              Row(
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.school_outlined,
+                        size: 16,
+                        color: Colors.black.withOpacity(0.6),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Sem ${subject['sem']}',
+                        style: GoogleFonts.inter(
+                          color: Colors.black.withOpacity(0.8),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+                  const SizedBox(width: 20),
+                ],
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 }
