@@ -19,10 +19,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Flutter
-        uses: bluefireteam/flutter-action@v1
-        with:
-          flutter-version: '3.25.3'
+      - name: Install Flutter manually
+        run: |
+          git clone https://github.com/flutter/flutter.git --branch 3.25.3 --depth 1
+          echo "$PWD/flutter/bin" >> $GITHUB_PATH
+          flutter doctor
 
       - name: Install dependencies
         run: flutter pub get
