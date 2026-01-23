@@ -21,6 +21,7 @@ jobs:
       - name: Install Flutter (stable)
         run: |
           git clone https://github.com/flutter/flutter.git --depth 1 -b stable
+          export PATH="$PWD/flutter/bin:$PATH"
           echo "$PWD/flutter/bin" >> $GITHUB_PATH
           flutter doctor
           flutter --version
