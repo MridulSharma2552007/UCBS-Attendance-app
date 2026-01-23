@@ -3,7 +3,7 @@ name: Flutter Release Build
 on:
   push:
     tags:
-      - "v*.*.*"   # Runs only when push a version tag like v1.0.0
+      - "v*.*.*"
 
 jobs:
   build:
@@ -20,7 +20,7 @@ jobs:
           java-version: '17'
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: bluefireteam/flutter-action@v1
         with:
           flutter-version: '3.25.3'
 
