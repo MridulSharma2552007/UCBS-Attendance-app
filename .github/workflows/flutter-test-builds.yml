@@ -10,8 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -19,11 +18,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Flutter manually
+      - name: Install Flutter (stable)
         run: |
-          git clone https://github.com/flutter/flutter.git --branch 3.25.3 --depth 1
+          git clone https://github.com/flutter/flutter.git --depth 1 -b stable
           echo "$PWD/flutter/bin" >> $GITHUB_PATH
           flutter doctor
+          flutter --version
 
       - name: Install dependencies
         run: flutter pub get
