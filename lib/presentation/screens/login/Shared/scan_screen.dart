@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -17,6 +18,10 @@ import 'package:ucbs_attendance_app/presentation/screens/main/student/home.dart'
 import 'package:ucbs_attendance_app/presentation/screens/main/teacher/pages/subject_selection.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 
+// Web-specific imports
+import 'dart:html' as html;
+import 'dart:typed_data' show Uint8List;
+
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
 
@@ -28,6 +33,8 @@ class _ScanScreenState extends State<ScanScreen> {
   CameraController? _controller;
   bool _loading = true;
   bool _uploading = false;
+  html.VideoElement? _videoElement;
+  html.MediaStream? _stream;
 
   double? personConfidence;
   bool embeddingCaptured = false;
@@ -39,12 +46,49 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   Future<void> _initCamera() async {
+    if (kIsWeb) {
+      await _initWebCamera();
+    } else {
+      await _initMobileCamera();
+    }
+  }
+
+  Future<void> _initWebCamera() async {
+    try {
+      _videoElement = html.VideoElement()
+        ..autoplay = true
+        ..muted = true
+        ..style.width = '100%'
+        ..style.height = '100%'
+        ..style.objectFit = 'cover';
+
+      _stream = await html.window.navigator.mediaDevices!.getUserMedia({
+        'video': {'facingMode': 'user'}
+      });
+
+      _videoElement!.srcObject = _stream;
+      
+      // Register the video element
+      html.document.body!.append(_videoElement!);
+      
+      setState(() => _loading = false);
+    } catch (e) {
+      debugPrint('Web camera error: $e');
+      setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _initMobileCamera() async {
     final permission = await Permission.camera.request();
-    if (!permission.isGranted) return;
+    if (!permission.isGranted) {
+      setState(() => _loading = false);
+      return;
+    }
 
     final cameras = await availableCameras();
     final frontCamera = cameras.firstWhere(
       (c) => c.lensDirection == CameraLensDirection.front,
+      orElse: () => cameras.first,
     );
 
     _controller = CameraController(
@@ -112,45 +156,7 @@ class _ScanScreenState extends State<ScanScreen> {
         return;
       }
 
-      final int? employeeId = StorageService.getInt(AppConstants.employeeIdKey);
-
-      if (userdata.role == AppConstants.teacherRole) {
-        if (employeeId == null) {
-          throw Exception("Employee ID not found in storage");
-        }
-        await VerifyTeacher().pushTeacherData(
-          id: employeeId,
-          email: userdata.email!,
-          name: userdata.name!,
-          vector: faceVector,
-          confidence: conf,
-        );
-      } else if (userdata.role == AppConstants.studentRole) {
-        await VerifiedStudent().pushStudentData(
-          email: userdata.email!,
-          name: userdata.name!,
-          rollNo: userdata.rollNo!,
-          sem: userdata.sem!,
-          vector: faceVector,
-          confidence: conf,
-        );
-      }
-
-      if (!mounted) return;
-
-      await StorageService.setString(AppConstants.roleKey, userdata.role!);
-      await StorageService.setBool(AppConstants.isLoggedKey, true);
-
-      await Future.delayed(const Duration(seconds: 1));
-      _controller?.dispose();
-
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => userdata.role == AppConstants.teacherRole 
-              ? const SubjectSelection() 
-              : const Home(),
-        ),
-      );
+      await _processDetection(userdata, faceVector, conf);
     } catch (e) {
       debugPrint("Upload error: $e");
       setState(() => _uploading = false);
@@ -165,9 +171,145 @@ class _ScanScreenState extends State<ScanScreen> {
     }
   }
 
+  Future<void> _captureWebImage() async {
+    if (_videoElement == null) return;
+    
+    try {
+      final canvas = html.CanvasElement(width: 640, height: 480);
+      final ctx = canvas.context2D;
+      
+      ctx.drawImageScaled(_videoElement!, 0, 0, 640, 480);
+      
+      final blob = await canvas.toBlob('image/jpeg', 0.8);
+      await _sendWebImage(blob);
+    } catch (e) {
+      debugPrint('Web capture error: $e');
+    }
+  }
+
+  Future<void> _sendWebImage(html.Blob imageBlob) async {
+    final userdata = context.read<UserSession>();
+    List<double>? faceVector;
+    try {
+      setState(() => _uploading = true);
+
+      final formData = html.FormData();
+      formData.appendBlob('file', imageBlob, 'capture.jpg');
+
+      final request = html.HttpRequest();
+      request.open('POST', AppConstants.detectEndpoint);
+      
+      final completer = Completer<String>();
+      request.onLoad.listen((e) {
+        completer.complete(request.responseText!);
+      });
+      request.onError.listen((e) {
+        completer.completeError('Request failed');
+      });
+      
+      request.send(formData);
+      final responseText = await completer.future;
+      
+      final decoded = jsonDecode(responseText);
+      final detections = decoded['detections'] as List;
+
+      double? conf;
+      bool hasEmbedding = false;
+
+      for (final d in detections) {
+        if (d['object'] == 'person') {
+          conf = (d['confidence'] as num).toDouble();
+
+          if (d['embedding'] != null) {
+            faceVector = List<double>.from(d['embedding']);
+            hasEmbedding = true;
+          }
+
+          break;
+        }
+      }
+
+      setState(() {
+        personConfidence = conf;
+        embeddingCaptured = hasEmbedding;
+        _uploading = false;
+      });
+
+      if (conf == null || conf < 0.50 || !hasEmbedding || faceVector == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Face not clear enough. Please try again."),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+        return;
+      }
+
+      await _processDetection(userdata, faceVector, conf);
+    } catch (e) {
+      debugPrint("Web upload error: $e");
+      setState(() => _uploading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error: ${e.toString()}"),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _processDetection(userdata, List<double> faceVector, double conf) async {
+    final int? employeeId = StorageService.getInt(AppConstants.employeeIdKey);
+
+    if (userdata.role == AppConstants.teacherRole) {
+      if (employeeId == null) {
+        throw Exception("Employee ID not found in storage");
+      }
+      await VerifyTeacher().pushTeacherData(
+        id: employeeId,
+        email: userdata.email!,
+        name: userdata.name!,
+        vector: faceVector,
+        confidence: conf,
+      );
+    } else if (userdata.role == AppConstants.studentRole) {
+      await VerifiedStudent().pushStudentData(
+        email: userdata.email!,
+        name: userdata.name!,
+        rollNo: userdata.rollNo!,
+        sem: userdata.sem!,
+        vector: faceVector,
+        confidence: conf,
+      );
+    }
+
+    if (!mounted) return;
+
+    await StorageService.setString(AppConstants.roleKey, userdata.role!);
+    await StorageService.setBool(AppConstants.isLoggedKey, true);
+
+    await Future.delayed(const Duration(seconds: 1));
+    _controller?.dispose();
+    _stream?.getTracks().forEach((track) => track.stop());
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => userdata.role == AppConstants.teacherRole 
+            ? const SubjectSelection() 
+            : const Home(),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _controller?.dispose();
+    _stream?.getTracks().forEach((track) => track.stop());
+    _videoElement?.remove();
     super.dispose();
   }
 
@@ -184,7 +326,12 @@ class _ScanScreenState extends State<ScanScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Positioned.fill(child: CameraPreview(_controller!)),
+          if (kIsWeb && _videoElement != null)
+            Positioned.fill(
+              child: HtmlElementView(viewType: 'video-${_videoElement.hashCode}'),
+            )
+          else if (!kIsWeb && _controller != null)
+            Positioned.fill(child: CameraPreview(_controller!)),
 
           Positioned(top: 40, left: 20, right: 20, child: InstructionCard()),
 
@@ -208,7 +355,9 @@ class _ScanScreenState extends State<ScanScreen> {
                 onTap: () async {
                   HapticFeedback.mediumImpact();
 
-                  if (_controller!.value.isInitialized) {
+                  if (kIsWeb) {
+                    await _captureWebImage();
+                  } else if (_controller?.value.isInitialized == true) {
                     final file = await _controller!.takePicture();
                     await _sendImage(file.path);
                   }
@@ -232,7 +381,6 @@ class _ScanScreenState extends State<ScanScreen> {
             ),
           ),
 
-          /// UPLOADING LOADER
           if (_uploading)
             const Center(child: CircularProgressIndicator(color: Colors.white)),
         ],
