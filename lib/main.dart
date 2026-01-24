@@ -2,17 +2,17 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ucbs_attendance_app/apis/apikeys.dart';
+import 'package:ucbs_attendance_app/core/config/app_config.dart';
 
 import 'package:ucbs_attendance_app/firebase_options.dart';
-import 'package:ucbs_attendance_app/provider/Data/user_session.dart';
-import 'package:ucbs_attendance_app/views/login/Gates/app_gate.dart';
+import 'package:ucbs_attendance_app/presentation/providers/Data/user_session.dart';
+import 'package:ucbs_attendance_app/presentation/screens/login/Gates/app_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  await Supabase.initialize(url: Apikeys.url, anonKey: Apikeys.anonKey);
+  await Supabase.initialize(url: AppConfig.supabaseUrl, anonKey: AppConfig.supabaseAnonKey);
   runApp(
     MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => UserSession())],

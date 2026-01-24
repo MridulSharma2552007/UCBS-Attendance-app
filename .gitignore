@@ -44,6 +44,10 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-
+# Environment variables and API keys
+.env
+.env.local
+.env.production
+lib/core/config/app_config.dart
 
 .vercel
