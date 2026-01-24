@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 import 'package:ucbs_attendance_app/data/services/Firebase/sign_in_with_google.dart';
 import 'package:ucbs_attendance_app/presentation/providers/Data/user_session.dart';
@@ -104,6 +105,7 @@ class _SignUpState extends State<SignUp> {
                       final session = context.read<UserSession>();
 
                       session.setEmail(user.email ?? "");
+                      StorageService.setString('userEmail', user.email!);
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

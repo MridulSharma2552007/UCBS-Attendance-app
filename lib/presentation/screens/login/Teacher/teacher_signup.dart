@@ -1,11 +1,10 @@
-// ignore_for_file: deprecated_member_use
-
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ucbs_attendance_app/core/constants/app_constants.dart';
+import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 import 'package:ucbs_attendance_app/presentation/providers/Data/user_session.dart';
 import 'package:ucbs_attendance_app/presentation/screens/login/Teacher/sign_in_teacher.dart';
@@ -133,11 +132,6 @@ class _FrostedLogicCardState extends State<FrostedLogicCard> {
                   Container(
                     height: 55,
                     margin: const EdgeInsets.only(top: 12, bottom: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade400,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-
                     child: Center(
                       child: GestureDetector(
                         onTap: () async {
@@ -148,36 +142,54 @@ class _FrostedLogicCardState extends State<FrostedLogicCard> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text("Please fill all details"),
-                                backgroundColor: Colors.redAccent,
+                                backgroundColor: AppColors.error,
                                 behavior: SnackBarBehavior.floating,
-                                duration: Duration(seconds: 2),
                               ),
                             );
                             return;
                           }
 
-                     
+                          try {
+                            final int employeeId = int.parse(empId);
+                            
+                            await StorageService.setInt(AppConstants.employeeIdKey, employeeId);
+                            await StorageService.setString(AppConstants.userNameKey, name);
+                            
+                            context.read<UserSession>().setName(name);
+                            context.read<UserSession>().setEmployeeId(employeeId);
 
-                         
-                          final prefs = await SharedPreferences.getInstance();
-
-                          final int employeeId = int.parse(empId);
-                          await prefs.setInt('employee_id', employeeId);
-                               context.read<UserSession>().setName(name);
-                          context.read<UserSession>().setEmployeeId(employeeId);                          
-
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (_) => const SignUp()),
-                          );
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (_) => const SignUp()),
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Invalid employee ID format"),
+                                backgroundColor: AppColors.error,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
                         },
 
                         child: Container(
+                          height: 55,
+                          width: double.infinity,
                           decoration: BoxDecoration(
                             color: AppColors.accentBlue,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Text('Submit'),
+                          child: const Center(
+                            child: Text(
+                              'Submit',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),

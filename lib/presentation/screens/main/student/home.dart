@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ucbs_attendance_app/core/constants/app_constants.dart';
+import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 
 class Home extends StatefulWidget {
@@ -11,8 +12,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   void setlogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool("isLogged", true);
+    await StorageService.setBool(AppConstants.isLoggedKey, true);
   }
 
   @override

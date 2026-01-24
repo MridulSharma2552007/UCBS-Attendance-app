@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ucbs_attendance_app/core/constants/app_constants.dart';
+import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 import 'package:ucbs_attendance_app/presentation/screens/login/Shared/login.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/home.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/teacher/teacher_home.dart';
@@ -8,15 +9,13 @@ class AppGate extends StatelessWidget {
   const AppGate({super.key});
 
   Future<Widget> _decide() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    final isLogged = prefs.getBool('isLogged') ?? false;
-    final role = prefs.getString('role');
+    final isLogged = StorageService.getBool(AppConstants.isLoggedKey) ?? false;
+    final role = StorageService.getString(AppConstants.roleKey);
 
     if (!isLogged) return const Login();
 
-    if (role == "Student") return const Home();
-    if (role == "Teacher") return const TeacherHome();
+    if (role == AppConstants.studentRole) return const Home();
+    if (role == AppConstants.teacherRole) return const TeacherHome();
 
     return const Login();
   }

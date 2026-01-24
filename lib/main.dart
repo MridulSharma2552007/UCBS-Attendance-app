@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ucbs_attendance_app/core/config/app_config.dart';
+import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 
 import 'package:ucbs_attendance_app/firebase_options.dart';
 import 'package:ucbs_attendance_app/presentation/providers/Data/user_session.dart';
@@ -10,13 +11,20 @@ import 'package:ucbs_attendance_app/presentation/screens/login/Gates/app_gate.da
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  await Supabase.initialize(url: AppConfig.supabaseUrl, anonKey: AppConfig.supabaseAnonKey);
+  // Initialize storage service first
+  await StorageService.init();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Supabase.initialize(
+    url: AppConfig.supabaseUrl,
+    anonKey: AppConfig.supabaseAnonKey,
+  );
+
   runApp(
     MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => UserSession())],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
@@ -26,6 +34,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: AppGate());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: const AppGate(),
+    );
   }
 }

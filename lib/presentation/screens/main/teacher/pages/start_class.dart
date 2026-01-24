@@ -93,7 +93,7 @@ class _StartClassState extends State<StartClass> {
       elapsedTime = Duration.zero;
       classStartTime = null;
     });
-    
+
     // Navigate back and refresh the main page
     Navigator.pop(context, true);
   }
@@ -145,7 +145,7 @@ class _StartClassState extends State<StartClass> {
     if (d.isNegative) {
       d = d.abs();
     }
-    
+
     String two(int n) => n.toString().padLeft(2, '0');
 
     final h = two(d.inHours);
@@ -203,10 +203,7 @@ class _StartClassState extends State<StartClass> {
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFF1A1A1A),
-                      const Color(0xFF2A2A2A),
-                    ],
+                    colors: [const Color(0xFF1A1A1A), const Color(0xFF2A2A2A)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -266,16 +263,19 @@ class _StartClassState extends State<StartClass> {
               const SizedBox(height: 40),
 
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
-                  color: isClassLive 
-                    ? Colors.green.withOpacity(0.1)
-                    : Colors.red.withOpacity(0.1),
+                  color: isClassLive
+                      ? Colors.green.withOpacity(0.1)
+                      : Colors.red.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isClassLive 
-                      ? Colors.green.withOpacity(0.3)
-                      : Colors.red.withOpacity(0.3),
+                    color: isClassLive
+                        ? Colors.green.withOpacity(0.3)
+                        : Colors.red.withOpacity(0.3),
                   ),
                 ),
                 child: Row(
@@ -309,9 +309,7 @@ class _StartClassState extends State<StartClass> {
                 decoration: BoxDecoration(
                   color: const Color(0xFF1A1A1A),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.1),
-                  ),
+                  border: Border.all(color: Colors.white.withOpacity(0.1)),
                 ),
                 child: Column(
                   children: [
@@ -333,7 +331,9 @@ class _StartClassState extends State<StartClass> {
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white60),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white60,
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -361,7 +361,7 @@ class _StartClassState extends State<StartClass> {
               ),
 
               const Spacer(),
-              
+
               if (!isClassLive)
                 Container(
                   height: 60,
@@ -410,7 +410,7 @@ class _StartClassState extends State<StartClass> {
                     ),
                   ),
                 ),
-              
+
               const SizedBox(height: 16),
 
               if (showEndButton && isClassLive)
@@ -433,11 +433,7 @@ class _StartClassState extends State<StartClass> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.stop,
-                              color: Colors.redAccent,
-                              size: 24,
-                            ),
+                            Icon(Icons.stop, color: Colors.redAccent, size: 24),
                             SizedBox(width: 8),
                             Text(
                               'End Class',

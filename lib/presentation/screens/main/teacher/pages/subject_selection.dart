@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 import 'package:ucbs_attendance_app/data/services/supabase/Teacher/get_subject_name.dart';
 import 'package:ucbs_attendance_app/presentation/providers/Data/user_session.dart';
@@ -65,14 +66,7 @@ class _SubjectSelectionState extends State<SubjectSelection> {
 
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-            child: Container(
-              height: 700,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: AppColors.bgLightDark,
-                borderRadius: BorderRadius.circular(20),
-              ),
-
+            child: Expanded(
               child: ListView.builder(
                 itemCount: subjects.length,
                 itemBuilder: (context, index) {
@@ -152,7 +146,8 @@ class _SubjectSelectionState extends State<SubjectSelection> {
             child: GestureDetector(
               onTap: () async {
                 final String? userEmail = context.read<UserSession>().email;
-                if (userEmail == null) {
+                if (userEmail == null ||
+                    StorageService.getString('userEmail') == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text("Fill ALL INFORMATION WITHOUT CLOSING APP"),
@@ -180,27 +175,35 @@ class _SubjectSelectionState extends State<SubjectSelection> {
                   return;
                 }
 
-                final supabase = Supabase.instance.client;
+                try {
+                  final supabase = Supabase.instance.client;
 
-                await supabase
-                    .from('teachers')
-                    .update({'subject': selectedSubjects})
-                    .eq('email', userEmail);
+                  await supabase
+                      .from('teachers')
+                      .update({'subject': selectedSubjects})
+                      .eq('email', StorageService.getString('userEmail')!);
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    backgroundColor: AppColors.success,
-                    content: Text("Subjects saved successfully"),
-                  ),
-                );
-                final prefs = await SharedPreferences.getInstance();
-                prefs.setBool('isLogged', true);
-                Future.delayed(Duration(seconds: 3), () {
+                  await StorageService.setBool('isLogged', true);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      backgroundColor: AppColors.success,
+                      content: Text("Subjects saved successfully"),
+                    ),
+                  );
+
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => TeacherMainpage()),
                   );
-                });
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: AppColors.error,
+                      content: Text("Error: $e"),
+                    ),
+                  );
+                }
               },
 
               child: Container(

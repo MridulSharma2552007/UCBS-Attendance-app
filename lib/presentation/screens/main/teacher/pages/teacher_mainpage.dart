@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ucbs_attendance_app/presentation/screens/main/teacher/pages/subject_selection.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/teacher/pages/start_class.dart';
 
@@ -37,6 +38,13 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
 
   void _refreshClassInfo() {
     _classInfoKey.currentState?.fetchClassInfo();
+  }
+
+  void _addSubj() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SubjectSelection()),
+    );
   }
 
   @override
@@ -85,20 +93,26 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
                           color: AppColors.accentyellow,
                           borderRadius: BorderRadius.circular(22),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.add, color: Colors.black, size: 20),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Add Class',
-                              style: GoogleFonts.inter(
-                                color: Colors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                        child: GestureDetector(
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            _addSubj();
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.add, color: Colors.black, size: 20),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Add Class',
+                                style: GoogleFonts.inter(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                       Container(

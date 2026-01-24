@@ -8,13 +8,14 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ucbs_attendance_app/core/constants/app_constants.dart';
+import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 import 'package:ucbs_attendance_app/data/services/supabase/Student/verified_student.dart';
 import 'package:ucbs_attendance_app/data/services/supabase/Teacher/verify_teacher.dart';
 import 'package:ucbs_attendance_app/presentation/providers/Data/user_session.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/home.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/teacher/pages/subject_selection.dart';
+import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -100,11 +101,31 @@ class _ScanScreenState extends State<ScanScreen> {
       });
 
       if (conf == null || conf < 0.50 || !hasEmbedding || faceVector == null) {
-        debugPrint("Face not valid for attendance");
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Face not clear enough. Please try again."),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
         return;
       }
 
-      if (userdata.role == "Student") {
+      final int? employeeId = StorageService.getInt(AppConstants.employeeIdKey);
+
+      if (userdata.role == AppConstants.teacherRole) {
+        if (employeeId == null) {
+          throw Exception("Employee ID not found in storage");
+        }
+        await VerifyTeacher().pushTeacherData(
+          id: employeeId,
+          email: userdata.email!,
+          name: userdata.name!,
+          vector: faceVector,
+          confidence: conf,
+        );
+      } else if (userdata.role == AppConstants.studentRole) {
         await VerifiedStudent().pushStudentData(
           email: userdata.email!,
           name: userdata.name!,
@@ -114,39 +135,33 @@ class _ScanScreenState extends State<ScanScreen> {
           confidence: conf,
         );
       }
-      final prefs = await SharedPreferences.getInstance();
-      final int? id = prefs.getInt('employee_id');
-
-      if (id == null) {
-        throw Exception("Employee ID not found in local storage");
-      }
-
-      if (userdata.role == "Teacher") {
-        await VerifyTeacher().pushTeacherData(
-          id: id,
-          email: userdata.email!,
-          name: userdata.name!,
-          vector: faceVector,
-          confidence: conf,
-        );
-      }
 
       if (!mounted) return;
 
-      await Future.delayed(const Duration(seconds: 2));
-      _controller?.dispose();
+      await StorageService.setString(AppConstants.roleKey, userdata.role!);
+      await StorageService.setBool(AppConstants.isLoggedKey, true);
 
-      await prefs.setString('role', userdata.role!);
+      await Future.delayed(const Duration(seconds: 1));
+      _controller?.dispose();
 
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (_) =>
-              userdata.role == "Teacher" ? SubjectSelection() : Home(),
+          builder: (_) => userdata.role == AppConstants.teacherRole 
+              ? const SubjectSelection() 
+              : const Home(),
         ),
       );
     } catch (e) {
       debugPrint("Upload error: $e");
       setState(() => _uploading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error: ${e.toString()}"),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     }
   }
 
