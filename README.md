@@ -1,225 +1,335 @@
-# 🎓 UCBS Attendance App
-
 <div align="center">
-  <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" />
-  <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" />
-  <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" />
-  <img src="https://img.shields.io/badge/AI-FF6B6B?style=for-the-badge&logo=tensorflow&logoColor=white" />
+
+# ✨ UCBS ATTENDANCE APP ✨
+
+```
+██╗   ██╗ ██████╗██████╗ ███████╗
+██║   ██║██╔════╝██╔══██╗██╔════╝
+██║   ██║██║     ██████╔╝███████╗
+██║   ██║██║     ██╔══██╗╚════██║
+╚██████╔╝╚██████╗██████╔╝███████║
+ ╚═════╝  ╚═════╝╚═════╝ ╚══════╝
+```
+
+### ⚡ **FACE RECOGNITION • AI POWERED • REAL-TIME** ⚡
+
+<img src="https://img.shields.io/badge/Flutter-02569B?style=flat-square&logo=flutter&logoColor=white" />
+<img src="https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white" />
+<img src="https://img.shields.io/badge/Firebase-FFCA28?style=flat-square&logo=firebase&logoColor=black" />
+<img src="https://img.shields.io/badge/AI-FF6B6B?style=flat-square&logo=tensorflow&logoColor=white" />
+
+**`[ NEXT-GEN ATTENDANCE SYSTEM ]`**
+
+*manually calling roll numbers is so 1998... 📜 → 🤖*
+
+---
+
 </div>
 
+## ✨ WHAT MAKES THIS SPECIAL?
+
+> **UCBS Attendance App** revolutionizes classroom attendance using cutting-edge AI face recognition technology. Built with Flutter's cross-platform power and Supabase's real-time backend, this isn't just another attendance app—**it's the future of educational technology.**
+
+<table>
+<tr>
+<td width="50%">
+
+### 🎯 **THE PROBLEM**
+```diff
+- ❌ Manual Roll Calls (10+ min wasted)
+- ❌ Proxy Attendance (fraud)
+- ❌ Paper Records (lost/illegible)
+- ❌ No Data Analysis
+```
+
+</td>
+<td width="50%">
+
+### ✅ **OUR SOLUTION**
+```diff
++ ⚡ 2-Second Attendance
++ 🔒 100% Authentic (AI)
++ 📊 Real-time Analytics
++ 🌐 Cloud Sync
+```
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🚀 FEATURES THAT'LL BLOW YOUR MIND
+
+### 🎭 **AI-POWERED FACE RECOGNITION**
+
 <div align="center">
-  <h3>🚀 Next-Gen Face Recognition Attendance System</h3>
-  <p><em>Because manually calling roll numbers is so 1998... 📜➡️🤖</em></p>
+
+```mermaid
+graph LR
+    A[📸 Camera] -->|Capture| B[🧠 AI Model]
+    B -->|512D Vector| C[✅ Verified]
+    style A fill:#ff6b6b
+    style B fill:#4ecdc4
+    style C fill:#95e1d3
+```
+
+</div>
+
+- ⚡ **Sub-second processing** with 99.7% accuracy
+- 🛡️ **Anti-spoofing** technology prevents photo/video tricks
+- 🌙 **Works in low light** with advanced image enhancement
+
+### 👥 **SMART ROLE MANAGEMENT**
+
+| Role | Features |
+|------|----------|
+| 🎓 **Students** | Quick check-in • Attendance history • Semester analytics |
+| 👨‍🏫 **Teachers** | Live class management • Detailed reports • Student insights |
+| 🔧 **Admin** | System-wide analytics • User management • Data export |
+
+### 🎨 **AESTHETIC UI/UX**
+
+<div align="center">
+
+**`[ GLASSMORPHISM • DARK MODE • 60FPS ANIMATIONS ]`**
+
+</div>
+
+- 💎 **Glassmorphism Design** → iOS-inspired premium feel
+- 🌑 **Dark Mode First** → Easy on the eyes, battery efficient
+- 🎬 **Smooth Animations** → 60fps interactions throughout
+- 📱 **Responsive Layout** → Perfect on any screen size
+
+### 📊 **ADVANCED ANALYTICS**
+
+```ascii
+┌─────────────────────────────────┐
+│  📈 REAL-TIME DASHBOARDS        │
+│  🔍 TREND ANALYSIS              │
+│  📋 AUTOMATED REPORTS           │
+│  💾 EXPORT (PDF/EXCEL/CSV)      │
+└─────────────────────────────────┘
+```
+
+---
+
+## 🛠️ TECH STACK & ARCHITECTURE
+
+<table>
+<tr>
+<td width="50%">
+
+### **FRONTEND**
+```yaml
+Flutter: 3.24+
+Design: Material Design 3
+Layout: Responsive
+```
+
+### **BACKEND**
+```yaml
+Database: Supabase + PostgreSQL
+Auth: Firebase
+Storage: Cloud-based
+```
+
+</td>
+<td width="50%">
+
+### **AI & VISION**
+```yaml
+Model: OpenCV + Buffalo
+Vector: 512-dimensional
+API: Python FastAPI + ngrok
+```
+
+### **ARCHITECTURE**
+```yaml
+Pattern: Clean Architecture
+State: Provider Pattern
+Data: Repository Pattern
+```
+
+</td>
+</tr>
+</table>
+
+---
+
+## 📱 APP FLOW & USER EXPERIENCE
+
+<div align="center">
+
+### **STUDENTS**
+```
+📱 Open App ──→ 👤 Face Scan ──→ ✅ Marked ──→ 📊 Stats
+```
+
+### **TEACHERS**
+```
+🎯 Start Class ──→ 👥 Check-ins ──→ 📊 Dashboard ──→ 📈 Reports
+```
+
 </div>
 
 ---
 
-## ✨ What Makes This Special?
+## 🎯 PROJECT GOALS & VISION
 
-**UCBS Attendance App** revolutionizes classroom attendance using cutting-edge AI face recognition technology. Built with Flutter's cross-platform power and Supabase's real-time backend, this isn't just another attendance app—it's the future of educational technology.
+<details>
+<summary><b>📍 PHASE 1: CORE FEATURES</b> ✅</summary>
 
-### 🎯 **The Problem We Solve**
-- ❌ **Manual Roll Calls** → Waste 10+ minutes every class
-- ❌ **Proxy Attendance** → Students marking for absent friends  
-- ❌ **Paper Records** → Lost sheets, illegible handwriting
-- ❌ **Data Analysis** → No insights into attendance patterns
-
-### ✅ **Our Solution**
-- ⚡ **2-Second Attendance** → AI recognizes faces instantly
-- 🔒 **100% Authentic** → Impossible to fake with face vectors
-- 📊 **Real-time Analytics** → Live dashboards for teachers
-- 🌐 **Cloud Sync** → Access from anywhere, anytime
-
----
-
-## 🚀 Features That'll Blow Your Mind
-
-### 🎭 **AI-Powered Face Recognition**
-```
-📸 Camera Capture → 🧠 512D Face Vector → ✅ Instant Recognition
-```
-- **Sub-second processing** with 99.7% accuracy
-- **Anti-spoofing** technology prevents photo/video tricks
-- **Works in low light** with advanced image enhancement
-
-### 👥 **Smart Role Management**
-- **Students**: Quick check-in, view attendance history, semester analytics
-- **Teachers**: Live class management, detailed reports, student insights
-- **Admin**: System-wide analytics, user management, data export
-
-### 🎨 **Aesthetic UI/UX**
-- **Glassmorphism Design** → iOS-inspired premium feel
-- **Dark Mode First** → Easy on the eyes, battery efficient
-- **Smooth Animations** → 60fps interactions throughout
-- **Responsive Layout** → Perfect on any screen size
-
-### 📊 **Advanced Analytics**
-- **Real-time Dashboards** → Live attendance tracking
-- **Trend Analysis** → Identify patterns and insights
-- **Automated Reports** → Weekly/monthly summaries
-- **Export Options** → PDF, Excel, CSV formats
-
----
-
-## 🛠️ **Tech Stack & Architecture**
-
-### **Frontend**
-- 🎯 **Flutter 3.24+** → Cross-platform native performance
-- 🎨 **Material Design 3** → Modern, accessible UI components
-- 📱 **Responsive Design** → Adaptive layouts for all devices
-
-### **Backend & Database**
-- ⚡ **Supabase** → Real-time database, auth, storage
-- 🔥 **Firebase** → Push notifications, analytics, crashlytics
-- 🗄️ **PostgreSQL** → Robust relational database
-
-### **AI & Computer Vision**
-- 🧠 **Custom Face Recognition API** → 512-dimensional face embeddings
-- 📸 **Camera Integration** → Real-time face detection
-- 🔒 **Anti-spoofing** → Liveness detection algorithms
-
-### **State Management & Architecture**
-- 🏗️ **Clean Architecture** → Scalable, maintainable codebase
-- 🔄 **Provider Pattern** → Efficient state management
-- 📦 **Repository Pattern** → Clean data layer abstraction
-
----
-
-## 📱 **App Flow & User Experience**
-
-### **For Students**
-```
-1. 📱 Open App → 2. 👤 Face Scan → 3. ✅ Attendance Marked → 4. 📊 View Stats
-```
-
-### **For Teachers**
-```
-1. 🎯 Start Class → 2. 👥 Students Check-in → 3. 📊 Live Dashboard → 4. 📈 Generate Reports
-```
-
----
-
-## 🎯 **Project Goals & Vision**
-
-### **Phase 1: Core Features** ✅
 - [x] Face recognition system
 - [x] User authentication (Google OAuth)
 - [x] Basic attendance marking
 - [x] Teacher/Student dashboards
 - [x] Real-time data sync
 
-### **Phase 2: Advanced Features** 🚧
+</details>
+
+<details>
+<summary><b>📍 PHASE 2: ADVANCED FEATURES</b> 🚧</summary>
+
 - [ ] Advanced analytics & insights
 - [ ] Bulk operations & data export
 - [ ] Push notifications
 - [ ] Offline mode support
 - [ ] Multi-language support
 
-### **Phase 3: Enterprise Features** 🔮
+</details>
+
+<details>
+<summary><b>📍 PHASE 3: ENTERPRISE FEATURES</b> 🔮</summary>
+
 - [ ] Admin panel & user management
 - [ ] Integration with existing LMS
 - [ ] Advanced reporting & compliance
 - [ ] API for third-party integrations
 - [ ] White-label solutions
 
+</details>
+
 ---
 
-## 📊 **Current Development Status**
+## 📊 DEVELOPMENT STATUS
 
 <div align="center">
 
-| Component | Progress | Status |
-|-----------|----------|--------|
-| 🎨 **UI/UX Design** | 85% | ✅ Complete |
-| 🧠 **Face Recognition** | 90% | ✅ Complete |
-| 🔐 **Authentication** | 100% | ✅ Complete |
-| 📱 **Mobile App** | 80% | 🚧 In Progress |
-| 📊 **Analytics** | 60% | 🚧 In Progress |
-| 🌐 **Backend API** | 95% | ✅ Complete |
-| 📚 **Documentation** | 70% | 🚧 In Progress |
-| 🧪 **Testing** | 40% | 🔄 Ongoing |
+```
+🎨 UI/UX Design      ████████████████░░░░ 85%  ✅
+🧠 Face Recognition  ██████████████████░░ 90%  ✅
+🔐 Authentication    ████████████████████ 100% ✅
+📱 Mobile App        ████████████████░░░░ 80%  🚧
+📊 Analytics         ████████████░░░░░░░░ 60%  🚧
+🌐 Backend API       ███████████████████░ 95%  ✅
+📚 Documentation     ██████████████░░░░░░ 70%  🚧
+🧪 Testing           ████████░░░░░░░░░░░░ 40%  🔄
+```
 
 </div>
 
 ---
 
-## 🚀 **Getting Started**
+## 🚀 GETTING STARTED
 
-### **Prerequisites**
-- Flutter SDK 3.24+
-- Dart 3.5+
-- Android Studio / VS Code
-- Git
+### **PREREQUISITES**
 
-### **Installation**
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/ucbs_attendance_app.git
+✓ Flutter SDK 3.24+
+✓ Dart 3.5+
+✓ Android Studio / VS Code
+✓ Git
+```
 
-# Navigate to project directory
+### **INSTALLATION**
+
+```bash
+# 1️⃣ Clone the repository
+git clone https://github.com/MridulSharma2552007/ucbs_attendance_app.git
+
+# 2️⃣ Navigate to project directory
 cd ucbs_attendance_app
 
-# Install dependencies
+# 3️⃣ Install dependencies
 flutter pub get
 
-# Set up environment variables
+# 4️⃣ Set up environment variables
 cp lib/core/config/app_config.example.dart lib/core/config/app_config.dart
 # Add your Supabase and Firebase credentials
 
-# Run the app
+# 5️⃣ Run the app
 flutter run
 ```
 
-### **Configuration**
-1. **Supabase Setup**: Create project, get URL & anon key
-2. **Firebase Setup**: Add `google-services.json` for Android
-3. **Face Recognition API**: Configure endpoint in constants
-4. **Environment Variables**: Update `app_config.dart` with your keys
+### **CONFIGURATION**
+
+| Step | Action |
+|------|--------|
+| 1️⃣ | **Supabase Setup** → Create project, get URL & anon key |
+| 2️⃣ | **Firebase Setup** → Add `google-services.json` for Android |
+| 3️⃣ | **Face Recognition API** → Configure endpoint in constants |
+| 4️⃣ | **Environment Variables** → Update `app_config.dart` with keys |
 
 ---
 
-## 🤝 **Contributing**
+## 🤝 CONTRIBUTING
 
-We welcome contributions! Here's how you can help:
+> We welcome contributions! Here's how you can help:
 
-1. 🍴 **Fork** the repository
-2. 🌿 **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. 💾 **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. 📤 **Push** to the branch (`git push origin feature/amazing-feature`)
-5. 🔄 **Open** a Pull Request
+```bash
+1. 🍴 Fork the repository
+2. 🌿 Create feature branch (git checkout -b feature/amazing-feature)
+3. 💾 Commit changes (git commit -m 'Add amazing feature')
+4. 📤 Push to branch (git push origin feature/amazing-feature)
+5. 🔄 Open a Pull Request
+```
 
-### **Development Guidelines**
-- Follow **Clean Architecture** principles
-- Write **unit tests** for new features
-- Use **conventional commits** for messages
-- Update **documentation** for API changes
+### **DEVELOPMENT GUIDELINES**
+
+- ✅ Follow **Clean Architecture** principles
+- ✅ Write **unit tests** for new features
+- ✅ Use **conventional commits** for messages
+- ✅ Update **documentation** for API changes
 
 ---
 
-## 📄 **License**
+## 📄 LICENSE
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🙏 **Acknowledgments**
+## 🙏 ACKNOWLEDGMENTS
 
-- **Flutter Team** → For the amazing cross-platform framework
-- **Supabase** → For the incredible backend-as-a-service
-- **UCBS Faculty** → For the inspiration and requirements
-- **Open Source Community** → For the countless packages and resources
+<table>
+<tr>
+<td align="center">💙 <b>Flutter Team</b><br/>Cross-platform framework</td>
+<td align="center">💚 <b>Supabase</b><br/>Backend-as-a-service</td>
+<td align="center">🐍 <b>OpenCV & Buffalo</b><br/>Face detection & vectors</td>
+<td align="center">🌐 <b>Open Source</b><br/>Packages & resources</td>
+</tr>
+</table>
 
 ---
 
 <div align="center">
-  <h3>🌟 If this project helped you, please give it a star! ⭐</h3>
-  <p><em>Built with ❤️ for the future of education</em></p>
-  
-  <img src="https://img.shields.io/github/stars/yourusername/ucbs_attendance_app?style=social" />
-  <img src="https://img.shields.io/github/forks/yourusername/ucbs_attendance_app?style=social" />
-  <img src="https://img.shields.io/github/watchers/yourusername/ucbs_attendance_app?style=social" />
-</div>
+
+### ⭐ STAR THIS REPO IF IT HELPED YOU! ⭐
+
+```
+╔═══════════════════════════════════════╗
+║  BUILT WITH ❤️ FOR THE FUTURE OF     ║
+║       EDUCATIONAL TECHNOLOGY          ║
+╚═══════════════════════════════════════╝
+```
+
+<img src="https://img.shields.io/github/stars/MridulSharma2552007/ucbs_attendance_app?style=social" />
+<img src="https://img.shields.io/github/forks/MridulSharma2552007/ucbs_attendance_app?style=social" />
+<img src="https://img.shields.io/github/watchers/MridulSharma2552007/ucbs_attendance_app?style=social" />
 
 ---
 
-**Made with 🔥 by [Your Name] | © 2024 UCBS Attendance App**
+**`[ MADE WITH 🔥 BY MRIDUL SHARMA | © 2025 UCBS ATTENDANCE APP ]`**
+
+</div>
