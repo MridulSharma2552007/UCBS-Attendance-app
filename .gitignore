@@ -48,6 +48,6 @@ app.*.map.json
 .env
 .env.local
 .env.production
-lib/core/config/app_config.dart
+
 
 .vercel
