@@ -21,6 +21,7 @@ import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart'
 // Web-specific imports
 import 'dart:html' as html;
 import 'dart:typed_data' show Uint8List;
+import 'package:ucbs_attendance_app/presentation/widgets/web/web_camera_widget.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -35,6 +36,7 @@ class _ScanScreenState extends State<ScanScreen> {
   bool _uploading = false;
   html.VideoElement? _videoElement;
   html.MediaStream? _stream;
+  bool _webCameraReady = false;
 
   double? personConfidence;
   bool embeddingCaptured = false;
@@ -54,28 +56,16 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   Future<void> _initWebCamera() async {
-    try {
-      _videoElement = html.VideoElement()
-        ..autoplay = true
-        ..muted = true
-        ..style.width = '100%'
-        ..style.height = '100%'
-        ..style.objectFit = 'cover';
+    setState(() => _loading = false);
+  }
 
-      _stream = await html.window.navigator.mediaDevices!.getUserMedia({
-        'video': {'facingMode': 'user'}
-      });
-
-      _videoElement!.srcObject = _stream;
-      
-      // Register the video element
-      html.document.body!.append(_videoElement!);
-      
-      setState(() => _loading = false);
-    } catch (e) {
-      debugPrint('Web camera error: $e');
-      setState(() => _loading = false);
-    }
+  void _onWebVideoReady(html.VideoElement video) {
+    debugPrint('ScanScreen: Video element received, setting up camera');
+    _videoElement = video;
+    setState(() {
+      _webCameraReady = true;
+      debugPrint('ScanScreen: Web camera ready state set to true');
+    });
   }
 
   Future<void> _initMobileCamera() async {
@@ -172,18 +162,36 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   Future<void> _captureWebImage() async {
-    if (_videoElement == null) return;
+    if (_videoElement == null || !_webCameraReady) {
+      debugPrint('Video element not ready');
+      return;
+    }
     
     try {
+      setState(() => _uploading = true);
+      
       final canvas = html.CanvasElement(width: 640, height: 480);
       final ctx = canvas.context2D;
       
       ctx.drawImageScaled(_videoElement!, 0, 0, 640, 480);
       
       final blob = await canvas.toBlob('image/jpeg', 0.8);
-      await _sendWebImage(blob);
+      if (blob != null) {
+        await _sendWebImage(blob);
+      } else {
+        throw Exception('Failed to create image blob');
+      }
     } catch (e) {
       debugPrint('Web capture error: $e');
+      setState(() => _uploading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Capture error: ${e.toString()}"),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     }
   }
 
@@ -191,25 +199,35 @@ class _ScanScreenState extends State<ScanScreen> {
     final userdata = context.read<UserSession>();
     List<double>? faceVector;
     try {
-      setState(() => _uploading = true);
-
+      debugPrint('Sending image to server: ${AppConstants.detectEndpoint}');
+      
       final formData = html.FormData();
       formData.appendBlob('file', imageBlob, 'capture.jpg');
 
       final request = html.HttpRequest();
       request.open('POST', AppConstants.detectEndpoint);
+      request.setRequestHeader('Accept', 'application/json');
+      request.setRequestHeader('ngrok-skip-browser-warning', 'true');
+      request.withCredentials = false;
       
       final completer = Completer<String>();
       request.onLoad.listen((e) {
-        completer.complete(request.responseText!);
+        debugPrint('Server response status: ${request.status}');
+        if (request.status == 200) {
+          completer.complete(request.responseText!);
+        } else {
+          completer.completeError('Server error: ${request.status}');
+        }
       });
       request.onError.listen((e) {
-        completer.completeError('Request failed');
+        debugPrint('Request error: $e');
+        completer.completeError('Network error');
       });
       
       request.send(formData);
       final responseText = await completer.future;
       
+      debugPrint('Server response: $responseText');
       final decoded = jsonDecode(responseText);
       final detections = decoded['detections'] as List;
 
@@ -308,8 +326,10 @@ class _ScanScreenState extends State<ScanScreen> {
   @override
   void dispose() {
     _controller?.dispose();
-    _stream?.getTracks().forEach((track) => track.stop());
-    _videoElement?.remove();
+    if (kIsWeb && _videoElement?.srcObject != null) {
+      final stream = _videoElement!.srcObject as html.MediaStream?;
+      stream?.getTracks().forEach((track) => track.stop());
+    }
     super.dispose();
   }
 
@@ -326,9 +346,9 @@ class _ScanScreenState extends State<ScanScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          if (kIsWeb && _videoElement != null)
+          if (kIsWeb)
             Positioned.fill(
-              child: HtmlElementView(viewType: 'video-${_videoElement.hashCode}'),
+              child: WebCameraWidget(onVideoReady: _onWebVideoReady),
             )
           else if (!kIsWeb && _controller != null)
             Positioned.fill(child: CameraPreview(_controller!)),
@@ -353,13 +373,21 @@ class _ScanScreenState extends State<ScanScreen> {
             child: Center(
               child: GestureDetector(
                 onTap: () async {
+                  debugPrint('ScanScreen: Camera button tapped');
+                  debugPrint('ScanScreen: kIsWeb=$kIsWeb, _webCameraReady=$_webCameraReady');
+                  debugPrint('ScanScreen: _videoElement=${_videoElement != null}');
+                  
                   HapticFeedback.mediumImpact();
 
-                  if (kIsWeb) {
+                  if (kIsWeb && _webCameraReady) {
+                    debugPrint('ScanScreen: Starting web image capture');
                     await _captureWebImage();
                   } else if (_controller?.value.isInitialized == true) {
+                    debugPrint('ScanScreen: Starting mobile image capture');
                     final file = await _controller!.takePicture();
                     await _sendImage(file.path);
+                  } else {
+                    debugPrint('ScanScreen: No camera ready for capture');
                   }
                 },
                 child: Container(
