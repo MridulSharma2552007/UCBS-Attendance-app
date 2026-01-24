@@ -324,9 +324,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ╚═══════════════════════════════════════╝
 ```
 
-<img src="https://img.shields.io/github/stars/MridulSharma2552007/ucbs_attendance_app?style=social" />
-<img src="https://img.shields.io/github/forks/MridulSharma2552007/ucbs_attendance_app?style=social" />
-<img src="https://img.shields.io/github/watchers/MridulSharma2552007/ucbs_attendance_app?style=social" />
+<img src="https://img.shields.io/github/stars/MridulSharma2552007/UCBS-Attendance-app?style=social" />
+<img src="https://img.shields.io/github/forks/MridulSharma2552007/UCBS-Attendance-app?style=social" />
+<img src="https://img.shields.io/github/watchers/MridulSharma2552007/UCBS-Attendance-app?style=social" />
 
 ---
 
