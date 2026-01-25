@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class VerifyTeacher {
@@ -32,10 +34,25 @@ class VerifyTeacher {
           .select('employee_id')
           .eq('employee_id', int.parse(id))
           .maybeSingle();
-      
+
       return response != null;
     } catch (e) {
       return false;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getTeacherData(String email) async {
+    try {
+      final response = await _client
+          .from('teachers')
+          .select('id, employee_id, name, email, subject, face_vector, created_at')
+          .eq('email', email)
+          .maybeSingle();
+
+      return response;
+    } catch (e) {
+      debugPrint('Error fetching teacher data: $e');
+      return null;
     }
   }
 }

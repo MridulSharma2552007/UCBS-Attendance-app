@@ -9,8 +9,38 @@ import 'package:ucbs_attendance_app/presentation/screens/login/Shared/login.dart
 
 class AuthService {
   static final _googleAuth = SignInWithGoogle();
-  static Future<void> signIn(BuildContext context) async {
-    final SupabaseClient = Supabase.instance.client;
+
+  static Future<void> signIn(
+    BuildContext context,
+    Map<String, dynamic> teacherData,
+  ) async {
+    try {
+      // Store data in SharedPreferences
+      await StorageService.setString('userEmail', teacherData['email']);
+      await StorageService.setString(
+        AppConstants.userNameKey,
+        teacherData['name'],
+      );
+      await StorageService.setInt(
+        AppConstants.employeeIdKey,
+        teacherData['employee_id'],
+      );
+      await StorageService.setString(
+        AppConstants.roleKey,
+        AppConstants.teacherRole,
+      );
+      await StorageService.setBool(AppConstants.isLoggedKey, true);
+
+      // Update provider
+      if (context.mounted) {
+        context.read<UserSession>().setEmail(teacherData['email']);
+        context.read<UserSession>().setName(teacherData['name']);
+        context.read<UserSession>().setrole(AppConstants.teacherRole);
+      }
+    } catch (e) {
+      debugPrint("Sign up error: $e");
+      rethrow;
+    }
   }
 
   // Sign Out Function
