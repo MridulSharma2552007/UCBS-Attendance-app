@@ -64,9 +64,9 @@ class _SubjectSelectionState extends State<SubjectSelection> {
             ),
           ),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-            child: Expanded(
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               child: ListView.builder(
                 itemCount: subjects.length,
                 itemBuilder: (context, index) {

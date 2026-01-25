@@ -24,4 +24,18 @@ class VerifyTeacher {
       throw Exception("Unknown Supabase error: $e");
     }
   }
+
+  Future<bool> checkTeacherIDExistance(String id) async {
+    try {
+      final response = await _client
+          .from('teachers')
+          .select('employee_id')
+          .eq('employee_id', int.parse(id))
+          .maybeSingle();
+      
+      return response != null;
+    } catch (e) {
+      return false;
+    }
+  }
 }

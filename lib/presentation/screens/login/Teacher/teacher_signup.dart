@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:ucbs_attendance_app/core/constants/app_constants.dart';
 import 'package:ucbs_attendance_app/core/services/storage_service.dart';
+import 'package:ucbs_attendance_app/data/services/supabase/Teacher/verify_teacher.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 import 'package:ucbs_attendance_app/presentation/providers/Data/user_session.dart';
 import 'package:ucbs_attendance_app/presentation/screens/login/Teacher/sign_in_teacher.dart';
@@ -135,41 +136,69 @@ class _FrostedLogicCardState extends State<FrostedLogicCard> {
                     child: Center(
                       child: GestureDetector(
                         onTap: () async {
-                          final name = namecontroller.text.trim();
-                          final empId = employeeidcontroller.text.trim();
+                          VerifyTeacher verifyTeacher = VerifyTeacher();
+                          bool isTeacherExists = await verifyTeacher
+                              .checkTeacherIDExistance(
+                                employeeidcontroller.text.trim(),
+                              );
+                          if (!isTeacherExists) {
+                            final name = namecontroller.text.trim();
+                            final empId = employeeidcontroller.text.trim();
 
-                          if (name.isEmpty || empId.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Please fill all details"),
-                                backgroundColor: AppColors.error,
-                                behavior: SnackBarBehavior.floating,
+                            if (name.isEmpty || empId.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Please fill all details"),
+                                  backgroundColor: AppColors.error,
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                              return;
+                            }
+
+                            try {
+                              final int employeeId = int.parse(empId);
+
+                              await StorageService.setInt(
+                                AppConstants.employeeIdKey,
+                                employeeId,
+                              );
+                              await StorageService.setString(
+                                AppConstants.userNameKey,
+                                name,
+                              );
+
+                              context.read<UserSession>().setName(name);
+                              context.read<UserSession>().setEmployeeId(
+                                employeeId,
+                              );
+
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const SignUp(),
+                                ),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Invalid employee ID format"),
+                                  backgroundColor: AppColors.error,
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            }
+                          } else {
+                            SnackBar snackBar = const SnackBar(
+                              content: Text(
+                                "Employee ID already exists. Please sign in.",
                               ),
+                              backgroundColor: AppColors.error,
+                              behavior: SnackBarBehavior.floating,
                             );
-                            return;
-                          }
-
-                          try {
-                            final int employeeId = int.parse(empId);
-                            
-                            await StorageService.setInt(AppConstants.employeeIdKey, employeeId);
-                            await StorageService.setString(AppConstants.userNameKey, name);
-                            
-                            context.read<UserSession>().setName(name);
-                            context.read<UserSession>().setEmployeeId(employeeId);
-
-                            Navigator.pushReplacement(
+                            ScaffoldMessenger.of(
                               context,
-                              MaterialPageRoute(builder: (_) => const SignUp()),
-                            );
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Invalid employee ID format"),
-                                backgroundColor: AppColors.error,
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
+                            ).showSnackBar(snackBar);
                           }
                         },
 
