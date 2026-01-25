@@ -7,6 +7,7 @@ import 'package:ucbs_attendance_app/data/services/Firebase/sign_in_with_google.d
 import 'package:ucbs_attendance_app/data/services/supabase/Teacher/verify_teacher.dart';
 import 'package:ucbs_attendance_app/presentation/screens/login/Shared/sign_up.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/teacher/pages/teacher_mainpage.dart';
+import 'package:ucbs_attendance_app/presentation/screens/main/teacher/teacher_home.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 
 class SignInTeacher extends StatefulWidget {
@@ -113,10 +114,19 @@ class FrostedLogicCard extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => TeacherMainpage(),
+                            builder: (context) => const TeacherHome(),
                           ),
                         );
                       } else {
+                        SnackBar snackBar = const SnackBar(
+                          content: Text(
+                            'No teacher account found for this email.',
+                          ),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        final googleinstance = SignInWithGoogle();
+                        await googleinstance.signOut();
+
                         debugPrint('Teacher not found');
                       }
                     }

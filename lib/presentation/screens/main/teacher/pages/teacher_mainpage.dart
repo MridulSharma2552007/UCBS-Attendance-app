@@ -1,11 +1,13 @@
 import 'dart:ui';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ucbs_attendance_app/presentation/screens/main/teacher/pages/settings.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/teacher/pages/subject_selection.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/teacher/pages/start_class.dart';
@@ -47,6 +49,13 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
     );
   }
 
+  void _onProfileNavigate() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const Settings()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,7 +89,6 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Top row with Add Class button and profile
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -115,17 +123,42 @@ class _TeacherMainpageState extends State<TeacherMainpage> {
                           ),
                         ),
                       ),
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          Icons.person_outline,
-                          size: 24,
-                          color: AppColors.textSecondary,
+                      GestureDetector(
+                        onTap: () => _onProfileNavigate(),
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: AppColors.accentBlue,
+                            borderRadius: BorderRadius.circular(12),
+                            image:
+                                FirebaseAuth.instance.currentUser?.photoURL !=
+                                    null
+                                ? DecorationImage(
+                                    image: NetworkImage(
+                                      FirebaseAuth
+                                          .instance
+                                          .currentUser!
+                                          .photoURL!,
+                                    ),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
+                          ),
+                          child:
+                              FirebaseAuth.instance.currentUser?.photoURL ==
+                                  null
+                              ? Center(
+                                  child: Text(
+                                    teacher['name'][0].toUpperCase(),
+                                    style: GoogleFonts.inter(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                )
+                              : null,
                         ),
                       ),
                     ],
