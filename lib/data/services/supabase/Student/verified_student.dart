@@ -26,4 +26,32 @@ class VerifiedStudent {
       throw Exception("Unknown Supabase error: $e");
     }
   }
+
+  Future<bool> isRollNoExists(String rollNo) async {
+    try {
+      final response = await _client
+          .from('students')
+          .select('roll_no')
+          .eq('roll_no', rollNo)
+          .maybeSingle();
+
+      return response != null;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getStudentData(String email) async {
+    try {
+      final response = await _client
+          .from('students')
+          .select()
+          .eq('email', email)
+          .maybeSingle();
+
+      return response;
+    } catch (e) {
+      return null;
+    }
+  }
 }

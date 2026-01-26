@@ -4,20 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ucbs_attendance_app/core/services/auth_service.dart';
 import 'package:ucbs_attendance_app/data/services/Firebase/sign_in_with_google.dart';
-import 'package:ucbs_attendance_app/data/services/supabase/Teacher/verify_teacher.dart';
+import 'package:ucbs_attendance_app/data/services/supabase/Student/verified_student.dart';
 import 'package:ucbs_attendance_app/presentation/screens/login/Shared/sign_up.dart';
-import 'package:ucbs_attendance_app/presentation/screens/main/teacher/pages/teacher_mainpage.dart';
-import 'package:ucbs_attendance_app/presentation/screens/main/teacher/teacher_home.dart';
+import 'package:ucbs_attendance_app/presentation/screens/main/student/home.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 
-class SignInTeacher extends StatefulWidget {
-  const SignInTeacher({super.key});
+class SignInStudent extends StatefulWidget {
+  const SignInStudent({super.key});
 
   @override
-  State<SignInTeacher> createState() => _SignInTeacherState();
+  State<SignInStudent> createState() => _SignInStudentState();
 }
 
-class _SignInTeacherState extends State<SignInTeacher> {
+class _SignInStudentState extends State<SignInStudent> {
   double opacity = 0.0;
 
   @override
@@ -100,34 +99,26 @@ class FrostedLogicCard extends StatelessWidget {
                   onTap: () async {
                     final user = await SignInWithGoogle().signIn();
                     if (user != null && user.email != null) {
-                      final email = user.email!;
-                      final name = user.displayName;
-                      debugPrint('Email: $email, Name: $name');
-
-                      final teacherData = await VerifyTeacher().getTeacherData(
-                        email,
-                      );
-                      if (teacherData != null) {
-                        debugPrint('Teacher found: $teacherData');
-                        AuthService.SignInTeacher(context, teacherData);
-                        print('Signed in as Teacher: $email');
+                      debugPrint('Signed in as Student: ${user.email}');
+                      final studentData = await VerifiedStudent()
+                          .getStudentData(user.email!);
+                      if (studentData != null) {
+                        debugPrint('Student found: $studentData');
+                        AuthService.SignInStudent(context, studentData);
+                        print('Signed in as Student: ${user.email}');
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const TeacherHome(),
-                          ),
+                          MaterialPageRoute(builder: (context) => const Home()),
                         );
                       } else {
                         SnackBar snackBar = const SnackBar(
                           content: Text(
-                            'No teacher account found for this email.',
+                            'No student record found. Please sign up.',
                           ),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         final googleinstance = SignInWithGoogle();
                         await googleinstance.signOut();
-
-                        debugPrint('Teacher not found');
                       }
                     }
                   },

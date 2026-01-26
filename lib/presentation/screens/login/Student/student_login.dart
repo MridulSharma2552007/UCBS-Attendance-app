@@ -1,9 +1,14 @@
 import 'dart:ui';
 import 'package:action_slider/action_slider.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:ucbs_attendance_app/core/constants/app_constants.dart';
+import 'package:ucbs_attendance_app/core/services/storage_service.dart';
+import 'package:ucbs_attendance_app/data/services/supabase/Student/verified_student.dart';
+import 'package:ucbs_attendance_app/presentation/screens/login/Student/sign_in_student.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 import 'package:ucbs_attendance_app/presentation/providers/Data/user_session.dart';
 import 'package:ucbs_attendance_app/presentation/screens/login/Shared/sign_up.dart';
@@ -188,7 +193,7 @@ class _FrostedStudentCardState extends State<FrostedStudentCard> {
                       if (widget.nameController.text.trim().isEmpty ||
                           widget.rollNoController.text.trim().isEmpty ||
                           selectedSem == null) {
-                        controller.reset(); 
+                        controller.reset();
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -215,23 +220,73 @@ class _FrostedStudentCardState extends State<FrostedStudentCard> {
                         );
                         return;
                       }
-
-                      controller.success();
-                      context.read<UserSession>().setName(
-                        widget.nameController.text,
+                      VerifiedStudent verifiedStudent = VerifiedStudent();
+                      final UserExists = verifiedStudent.isRollNoExists(
+                        widget.rollNoController.text.trim(),
                       );
-                      context.read<UserSession>().setrollno(
-                        widget.rollNoController.text,
-                      );
-                      context.read<UserSession>().setSem(selectedSem!);
+                      if (await UserExists) {
+                        controller.reset();
 
-                      await Future.delayed(const Duration(milliseconds: 400));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              "Roll number already exists, try logging in",
+                            ),
+                            backgroundColor: Colors.redAccent,
+                          ),
+                        );
+                        return;
+                      } else {
+                        StorageService.setString(
+                          AppConstants.studentIdKey,
+                          widget.rollNoController.text.trim(),
+                        );
+                        controller.success();
+                        context.read<UserSession>().setName(
+                          widget.nameController.text,
+                        );
+                        context.read<UserSession>().setrollno(
+                          widget.rollNoController.text,
+                        );
+                        context.read<UserSession>().setSem(selectedSem!);
 
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => SignUp()),
-                      );
+                        await Future.delayed(const Duration(milliseconds: 400));
+
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignUp()),
+                        );
+                      }
                     },
+                  ),
+                  SizedBox(height: 20),
+                  RichText(
+                    text: TextSpan(
+                      text: 'Already have an account? ',
+                      style: GoogleFonts.dmSans(
+                        color: AppColors.textSecondary,
+                        fontSize: 14,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: 'Log In',
+                          style: GoogleFonts.dmSans(
+                            color: Colors.deepOrangeAccent,
+                            fontSize: 14,
+                            decoration: TextDecoration.underline,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SignInStudent(),
+                                ),
+                              );
+                            },
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

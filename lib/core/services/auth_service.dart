@@ -6,11 +6,52 @@ import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 import 'package:ucbs_attendance_app/data/services/Firebase/sign_in_with_google.dart';
 import 'package:ucbs_attendance_app/presentation/providers/Data/user_session.dart';
 import 'package:ucbs_attendance_app/presentation/screens/login/Shared/login.dart';
+import 'package:ucbs_attendance_app/presentation/screens/login/Teacher/sign_in_teacher.dart';
 
 class AuthService {
   static final _googleAuth = SignInWithGoogle();
+  static Future<void> SignInStudent(
+    BuildContext context,
+    Map<String, dynamic> studentData,
+  ) async {
+    try {
+      debugPrint('SignInStudent called with: $studentData');
 
-  static Future<void> signIn(
+      // Store data in SharedPreferences
+      await StorageService.setString('userEmail', studentData['email']);
+      await StorageService.setString(
+        AppConstants.userNameKey,
+        studentData['name'],
+      );
+      await StorageService.setString(
+        'roll_no',
+        studentData['roll_no'].toString(),
+      );
+      await StorageService.setInt(
+        'semester',
+        int.parse(studentData['semester'].toString()),
+      );
+      await StorageService.setString(
+        AppConstants.roleKey,
+        AppConstants.studentRole,
+      );
+      await StorageService.setBool(AppConstants.isLoggedKey, true);
+
+      debugPrint('Student data saved to prefs');
+
+      // Update provider
+      if (context.mounted) {
+        context.read<UserSession>().setEmail(studentData['email']);
+        context.read<UserSession>().setName(studentData['name']);
+        context.read<UserSession>().setrole(AppConstants.studentRole);
+      }
+    } catch (e) {
+      debugPrint("Sign in error: $e");
+      rethrow;
+    }
+  }
+
+  static Future<void> SignInTeacher(
     BuildContext context,
     Map<String, dynamic> teacherData,
   ) async {
