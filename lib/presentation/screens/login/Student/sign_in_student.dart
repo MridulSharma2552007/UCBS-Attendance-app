@@ -106,6 +106,7 @@ class FrostedLogicCard extends StatelessWidget {
                         debugPrint('Student found: $studentData');
                         AuthService.SignInStudent(context, studentData);
                         print('Signed in as Student: ${user.email}');
+                        if (!context.mounted) return;
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => const Home()),

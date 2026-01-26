@@ -147,22 +147,17 @@ class _ScanScreenState extends State<ScanScreen> {
       debugPrint("Upload error: $e");
       setState(() => _uploading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error: ${e.toString()}"),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        _showServerErrorDialog();
       }
     }
   }
 
   Future<void> _captureWebImage() async {
     if (!kIsWeb || _videoElement == null || !_webCameraReady) return;
-    
+
     try {
       setState(() => _uploading = true);
-      
+
       final blob = await captureFromVideo(_videoElement!);
       if (blob != null) {
         await _sendWebImage(blob);
@@ -184,12 +179,15 @@ class _ScanScreenState extends State<ScanScreen> {
 
   Future<void> _sendWebImage(dynamic imageBlob) async {
     if (!kIsWeb) return;
-    
+
     final userdata = context.read<UserSession>();
     List<double>? faceVector;
     try {
-      final responseText = await sendBlobToServer(imageBlob, AppConstants.detectEndpoint);
-      
+      final responseText = await sendBlobToServer(
+        imageBlob,
+        AppConstants.detectEndpoint,
+      );
+
       final decoded = jsonDecode(responseText);
       final detections = decoded['detections'] as List;
 
@@ -232,17 +230,72 @@ class _ScanScreenState extends State<ScanScreen> {
       debugPrint("Web upload error: $e");
       setState(() => _uploading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error: ${e.toString()}"),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        _showServerErrorDialog();
       }
     }
   }
 
-  Future<void> _processDetection(userdata, List<double> faceVector, double conf) async {
+  void _showServerErrorDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
+            SizedBox(width: 12),
+            Text(
+              'Server Down',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Face recognition server is currently under maintenance.',
+              style: TextStyle(color: Colors.white70, fontSize: 15),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'For assistance, contact:',
+              style: TextStyle(color: Colors.white60, fontSize: 13),
+            ),
+            SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(Icons.email, color: Colors.blue, size: 18),
+                SizedBox(width: 8),
+                Text(
+                  'hpu.ucbs@gmail.com',
+                  style: TextStyle(color: Colors.blue, fontSize: 14),
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK', style: TextStyle(color: Colors.blue)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _processDetection(
+    userdata,
+    List<double> faceVector,
+    double conf,
+  ) async {
     final int? employeeId = StorageService.getInt(AppConstants.employeeIdKey);
 
     if (userdata.role == AppConstants.teacherRole) {
@@ -277,8 +330,8 @@ class _ScanScreenState extends State<ScanScreen> {
 
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => userdata.role == AppConstants.teacherRole 
-            ? const SubjectSelection() 
+        builder: (_) => userdata.role == AppConstants.teacherRole
+            ? const SubjectSelection()
             : const Home(),
       ),
     );
@@ -389,7 +442,9 @@ class InstructionCard extends StatelessWidget {
                 "• Look straight at the camera\n"
                 "• Avoid backlight\n"
                 "• Hold still for 1–2 seconds\n"
-                "• AI captures 512-D facial vector",
+                "• AI captures 512-D facial vector\n\n"
+                "🔒 Your photo will NOT be saved.\n"
+                "We only extract a mathematical vector (512 numbers).",
           ),
         ),
       ),
