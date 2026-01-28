@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 
 class NotificationService {
   static bool _initialized = false;
@@ -15,6 +16,7 @@ class NotificationService {
 
     String? token = await messaging.getToken();
     print("✅ FCM Token: $token");
+    StorageService.setString('fcm_token', token ?? '');
 
     FirebaseMessaging.onMessage.listen((message) {
       print("📩 Foreground notification: ${message.notification?.title}");
