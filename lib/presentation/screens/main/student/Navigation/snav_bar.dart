@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 
 class SnavBar extends StatefulWidget {
@@ -23,11 +24,14 @@ class _SnavBarState extends State<SnavBar> {
         borderRadius: BorderRadius.circular(50),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: List.generate(items.length, (index) {
           final isActive = index == widget.currentIndex;
           return GestureDetector(
-            onTap: () => widget.onTap(index),
+            onTap: () {
+              widget.onTap(index);
+              HapticFeedback.lightImpact();
+            },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               padding: const EdgeInsets.all(12),
