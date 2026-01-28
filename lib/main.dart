@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ucbs_attendance_app/core/config/app_config.dart';
+import 'package:ucbs_attendance_app/core/services/notification_service.dart';
 import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 
 import 'package:ucbs_attendance_app/firebase_options.dart';
@@ -20,6 +21,7 @@ void main() async {
   await StorageService.init();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   await Supabase.initialize(
     url: AppConfig.supabaseUrl,
     anonKey: AppConfig.supabaseAnonKey,
@@ -33,8 +35,19 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    NotificationService.init();
+  }
 
   @override
   Widget build(BuildContext context) {

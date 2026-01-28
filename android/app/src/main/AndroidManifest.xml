@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 <uses-permission android:name="android.permission.CAMERA"/>
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
 <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <application
         android:label="ucbs_attendance_app"
