@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 
 class VerifiedStudent {
   final _client = Supabase.instance.client;
@@ -19,6 +20,7 @@ class VerifiedStudent {
         'semester': sem,
         'face_vector': vector,
         'confidence': confidence,
+        'fcm': StorageService.getString('fcm_token') ?? '',
       });
     } on PostgrestException catch (e) {
       throw Exception("Supabase insert failed: ${e.message}");
