@@ -1,0 +1,88 @@
+File Tree: lib
+Generated on: 1/30/2026, 10:50:38 AM
+Root path: /home/void/Flutter/ucbs_attendance_app/lib
+
+────────────────────────────────────────────────────────────────────────────────
+
+├── 📁 core/
+│   ├── 📁 config/
+│   │   ├── 📄 app_config.dart
+│   │   └── 📄 app_config.example.dart
+│   ├── 📁 constants/
+│   │   └── 📄 app_constants.dart
+│   ├── 📁 services/
+│   │   ├── 📄 auth_service.dart
+│   │   ├── 📄 notification_service.dart
+│   │   └── 📄 storage_service.dart
+│   └── 📁 utils/
+├── 📁 data/
+│   ├── 📁 models/
+│   ├── 📁 repositories/
+│   └── 📁 services/
+│       ├── 📁 Firebase/
+│       │   └── 📄 sign_in_with_google.dart
+│       └── 📁 supabase/
+│           ├── 📁 Student/
+│           │   └── 📄 verified_student.dart
+│           └── 📁 Teacher/
+│               ├── 📄 get_subject_name.dart
+│               └── 📄 verify_teacher.dart
+├── 📁 domain/
+│   ├── 📁 entities/
+│   ├── 📁 repositories/
+│   └── 📁 usecases/
+├── 📁 presentation/
+│   ├── 📁 providers/
+│   │   └── 📁 Data/
+│   │       └── 📄 user_session.dart
+│   ├── 📁 screens/
+│   │   ├── 📁 login/
+│   │   │   ├── 📁 Gates/
+│   │   │   │   ├── 📄 app_gate.dart
+│   │   │   │   └── 📄 user_info.dart
+│   │   │   ├── 📁 Shared/
+│   │   │   │   ├── 📄 html_stub.dart
+│   │   │   │   ├── 📄 login.dart
+│   │   │   │   ├── 📄 role_selection.dart
+│   │   │   │   ├── 📄 scan_screen.dart
+│   │   │   │   ├── 📄 sign_up.dart
+│   │   │   │   ├── 📄 web_helper.dart
+│   │   │   │   └── 📄 web_helper_stub.dart
+│   │   │   ├── 📁 Student/
+│   │   │   │   ├── 📄 sign_in_student.dart
+│   │   │   │   └── 📄 student_login.dart
+│   │   │   └── 📁 Teacher/
+│   │   │       ├── 📄 sign_in_teacher.dart
+│   │   │       └── 📄 teacher_signup.dart
+│   │   └── 📁 main/
+│   │       ├── 📁 student/
+│   │       │   ├── 📁 Navigation/
+│   │       │   │   └── 📄 snav_bar.dart
+│   │       │   ├── 📁 pages/
+│   │       │   │   ├── 📄 enroll_class.dart
+│   │       │   │   ├── 📄 profile_screen_student.dart
+│   │       │   │   ├── 📄 search_student.dart
+│   │       │   │   └── 📄 student_main_screen.dart
+│   │       │   └── 📄 home.dart
+│   │       └── 📁 teacher/
+│   │           ├── 📁 Navigation/
+│   │           │   └── 📄 navbar.dart
+│   │           ├── 📁 pages/
+│   │           │   ├── 📄 report.dart
+│   │           │   ├── 📄 search.dart
+│   │           │   ├── 📄 settings.dart
+│   │           │   ├── 📄 start_class.dart
+│   │           │   ├── 📄 student_info.dart
+│   │           │   ├── 📄 subject_selection.dart
+│   │           │   └── 📄 teacher_mainpage.dart
+│   │           └── 📄 teacher_home.dart
+│   └── 📁 widgets/
+│       ├── 📁 common/
+│       │   └── 📄 app_colors.dart
+│       └── 📁 web/
+│           ├── 📄 web_camera_stub.dart
+│           └── 📄 web_camera_widget.dart
+├── 📄 firebase_options.dart
+└── 📄 main.dart
+
+────────────────────────────────────────────────────────────────────────────────
