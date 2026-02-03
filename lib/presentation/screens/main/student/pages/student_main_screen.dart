@@ -57,6 +57,7 @@ class _StudentMainScreenState extends State<StudentMainScreen> {
             ),
             SizedBox(height: 16),
             _buildLiveClasses(),
+            SizedBox(height: 50),
           ],
         ),
       ),
@@ -301,7 +302,9 @@ class _StudentMainScreenState extends State<StudentMainScreen> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                final studentSem = StorageService.getInt('semester');
+                                final studentSem = StorageService.getInt(
+                                  'semester',
+                                );
                                 if (studentSem != classData['sem']) {
                                   showDialog(
                                     context: context,
@@ -312,22 +315,38 @@ class _StudentMainScreenState extends State<StudentMainScreen> {
                                       ),
                                       title: Row(
                                         children: [
-                                          Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
+                                          Icon(
+                                            Icons.warning_amber_rounded,
+                                            color: Colors.orange,
+                                            size: 28,
+                                          ),
                                           SizedBox(width: 12),
                                           Text(
                                             'Not Enrolled',
-                                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ],
                                       ),
                                       content: Text(
                                         'You are not enrolled in Semester ${classData['sem']}. Please contact admin to update your semester.',
-                                        style: TextStyle(color: Colors.white70, fontSize: 15),
+                                        style: TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 15,
+                                        ),
                                       ),
                                       actions: [
                                         TextButton(
-                                          onPressed: () => Navigator.pop(context),
-                                          child: Text('OK', style: TextStyle(color: Colors.blue)),
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: Text(
+                                            'OK',
+                                            style: TextStyle(
+                                              color: Colors.blue,
+                                            ),
+                                          ),
                                         ),
                                       ],
                                     ),
