@@ -84,7 +84,7 @@ class _StudentMainScreenState extends State<StudentMainScreen> {
               Icon(Icons.class_, size: 48, color: Colors.black26),
               SizedBox(height: 12),
               Text(
-                'No live classes',
+                'No live classes.',
                 style: GoogleFonts.inter(
                   fontSize: 16,
                   color: Colors.black54,
