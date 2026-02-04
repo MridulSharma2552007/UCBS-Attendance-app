@@ -48,7 +48,7 @@ class _StudentMainScreenState extends State<StudentMainScreen> {
             WeeklyAttendanceChart(),
             SizedBox(height: 40),
             Text(
-              'Live Classes',
+              'Live Classes.',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
