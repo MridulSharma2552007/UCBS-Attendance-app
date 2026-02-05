@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/colors/student_theme.dart';
+import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -15,7 +16,7 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
-  bool? _isInCollege;
+  bool _isInCollege = false;
   bool _isLoading = true;
   Position? _currentPosition;
   double? _distance;
@@ -94,8 +95,10 @@ class _LocationScreenState extends State<LocationScreen> {
       try {
         print('Checking location... Attempt ${attempts + 1}');
         final position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best,
-          timeLimit: const Duration(seconds: 8),
+          desiredAccuracy: attempts == 0
+              ? LocationAccuracy.high
+              : LocationAccuracy.medium,
+          timeLimit: Duration(seconds: attempts == 0 ? 15 : 10),
         );
 
         print('Attempt ${attempts + 1}: accuracy ${position.accuracy}m');
@@ -112,12 +115,17 @@ class _LocationScreenState extends State<LocationScreen> {
 
         attempts++;
 
-        if (attempts < maxAttempts) {
-          await Future.delayed(const Duration(milliseconds: 1500));
+        if (attempts < maxAttempts && position.accuracy > 100) {
+          await Future.delayed(const Duration(seconds: 2));
+        } else if (attempts < maxAttempts) {
+          break;
         }
       } catch (e) {
         print('Attempt ${attempts + 1} failed: $e');
         attempts++;
+        if (attempts < maxAttempts) {
+          await Future.delayed(const Duration(seconds: 1));
+        }
       }
     }
 
@@ -186,9 +194,47 @@ class _LocationScreenState extends State<LocationScreen> {
                     const SizedBox(height: 20),
                     _buildMapCard(),
                     const SizedBox(height: 20),
-                    if (!_isLoading) _buildRetryButton(),
+                    if (!_isLoading && !_isInCollege) _buildRetryButton(),
+                    if (!_isLoading && _isInCollege) ...[
+                      const SizedBox(height: 20),
+                      _buildNextButton(),
+                    ],
                   ],
                 ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNextButton() {
+    return GestureDetector(
+      onTap: () {},
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: AppColors.success,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Next ',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                letterSpacing: 1.2,
               ),
             ),
           ],
