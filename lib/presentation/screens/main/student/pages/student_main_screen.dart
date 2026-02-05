@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 import 'package:ucbs_attendance_app/data/services/supabase/Student/fetch_live_classes.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/colors/student_theme.dart';
+import 'package:ucbs_attendance_app/presentation/screens/main/student/pages/location_screen.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/charts/weekly_attendance_chart.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 
@@ -352,7 +353,12 @@ class _StudentMainScreenState extends State<StudentMainScreen> {
                                     ),
                                   );
                                 } else {
-                                  // Join class logic here
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => LocationScreen(),
+                                    ),
+                                  );
                                 }
                               },
                               child: Container(
