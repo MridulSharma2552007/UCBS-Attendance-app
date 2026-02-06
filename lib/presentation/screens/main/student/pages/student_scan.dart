@@ -1,9 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:ucbs_attendance_app/core/constants/app_constants.dart';
+import 'package:ucbs_attendance_app/core/services/storage_service.dart';
+import 'package:ucbs_attendance_app/data/services/supabase/Student/compare_vector.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/colors/student_theme.dart';
+import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 
 class StudentScan extends StatefulWidget {
   const StudentScan({super.key});
@@ -23,6 +29,8 @@ class _StudentScanState extends State<StudentScan>
       "🔒 We're not storing your photo. Only extracting 512D face vectors. No one can see your photo, not even us.";
 
   XFile? _image;
+  bool _uploading = false;
+  bool _showSuccess = false;
 
   Future<bool> getCameraPermission() async {
     final status = await Permission.camera.request();
@@ -78,11 +86,137 @@ class _StudentScanState extends State<StudentScan>
     setState(() {});
   }
 
+  Future<void> _sendImage(String path) async {
+    List<double>? faceVector;
+    try {
+      setState(() {
+        _uploading = true;
+      });
+
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse(AppConstants.detectEndpoint),
+      );
+
+      request.files.add(await http.MultipartFile.fromPath('file', path));
+
+      final response = await request.send();
+      final body = await response.stream.bytesToString();
+      final decoded = jsonDecode(body);
+
+      final detections = decoded['detections'] as List;
+
+      double? conf;
+      bool hasEmbedding = false;
+
+      for (final d in detections) {
+        if (d['object'] == 'person') {
+          conf = (d['confidence'] as num).toDouble();
+
+          if (d['embedding'] != null) {
+            faceVector = List<double>.from(d['embedding']);
+            hasEmbedding = true;
+          }
+
+          break;
+        }
+      }
+
+      setState(() {
+        _uploading = false;
+      });
+
+      if (conf == null || conf < 0.50 || !hasEmbedding || faceVector == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Face not clear enough. Please try again."),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+        setState(() {
+          _image = null;
+        });
+        return;
+      }
+
+      final rollNo = StorageService.getString('roll_no');
+      if (rollNo == null || rollNo.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Roll number not found. Please login again."),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+        setState(() {
+          _image = null;
+        });
+        return;
+      }
+
+      await CompareVector().putScannedVector(rollNo, jsonEncode(faceVector));
+
+      // Compare vectors
+      final isMatch = await CompareVector().compareFaceVectors(rollNo);
+
+      if (!isMatch) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("❌ Face doesn't match. Please try again."),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+        setState(() {
+          _image = null;
+        });
+        return;
+      }
+
+      // Success - Show success screen
+      if (mounted) {
+        _showSuccessScreen();
+      }
+    } catch (e) {
+      debugPrint("Upload error: $e");
+      setState(() {
+        _uploading = false;
+        _image = null;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Server error: ${e.toString()}"),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   void dispose() {
     _controller?.dispose();
     _typingController?.dispose();
     super.dispose();
+  }
+
+  void _showSuccessScreen() {
+    _controller?.dispose();
+
+    setState(() {
+      _showSuccess = true;
+    });
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    });
   }
 
   @override
@@ -100,6 +234,57 @@ class _StudentScanState extends State<StudentScan>
               future: _initializeControllerFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
+                  if (_showSuccess) {
+                    return Container(
+                      color: Colors.black,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.green.withOpacity(0.2),
+                              ),
+                              child: Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                                size: 80,
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+                            Text(
+                              '✅ Attendance Marked!',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'You\'re all set for today',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            Text(
+                              'Redirecting...',
+                              style: TextStyle(
+                                color: Colors.white54,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
                   if (_image != null) {
                     return Container(
                       color: Colors.black,
@@ -260,6 +445,7 @@ class _StudentScanState extends State<StudentScan>
                                   setState(() {
                                     _image = image;
                                   });
+                                  await _sendImage(image.path);
                                 } catch (e) {
                                   debugPrint(e.toString());
                                 }
