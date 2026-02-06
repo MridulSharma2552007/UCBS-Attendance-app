@@ -26,6 +26,14 @@ jobs:
           flutter doctor
           flutter --version
 
+      - name: Create .env file with secrets
+        run: |
+          cat << EOF > .env
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+          FACE_API_URL=${{ secrets.FACE_API_URL }}
+          EOF
+
       - name: Install dependencies
         run: flutter pub get
 
@@ -33,11 +41,11 @@ jobs:
         run: flutter build apk --release
 
       - name: Rename APK
-        run: mv build/app/outputs/flutter-apk/app-release.apk myapp-${{ github.ref_name }}.apk
+        run: mv build/app/outputs/flutter-apk/app-release.apk UCBS-Attendance-${{ github.ref_name }}.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: myapp-${{ github.ref_name }}.apk
+          files: UCBS-Attendance-${{ github.ref_name }}.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
