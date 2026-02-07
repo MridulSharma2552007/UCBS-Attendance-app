@@ -188,12 +188,7 @@ class _StudentScanState extends State<StudentScan>
         _image = null;
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Server error: ${e.toString()}"),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        _showServerErrorDialog();
       }
     }
   }
@@ -217,6 +212,62 @@ class _StudentScanState extends State<StudentScan>
         Navigator.of(context).pop();
       }
     });
+  }
+
+  void _showServerErrorDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
+            SizedBox(width: 12),
+            Text(
+              'Server Down',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Face recognition server is currently under maintenance.',
+              style: TextStyle(color: Colors.white70, fontSize: 15),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'For assistance, contact:',
+              style: TextStyle(color: Colors.white60, fontSize: 13),
+            ),
+            SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(Icons.email, color: Colors.blue, size: 18),
+                SizedBox(width: 8),
+                Text(
+                  'hpu.ucbs@gmail.com',
+                  style: TextStyle(color: Colors.blue, fontSize: 14),
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK', style: TextStyle(color: Colors.blue)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

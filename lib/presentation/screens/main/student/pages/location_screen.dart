@@ -87,6 +87,7 @@ class _LocationScreenState extends State<LocationScreen> {
     Position? bestPosition;
     int attempts = 0;
     const maxAttempts = 3;
+    const targetAccuracy = 30.0;
 
     while (attempts < maxAttempts) {
       setState(() {
@@ -96,30 +97,24 @@ class _LocationScreenState extends State<LocationScreen> {
       try {
         print('Checking location... Attempt ${attempts + 1}');
         final position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: attempts == 0
-              ? LocationAccuracy.high
-              : LocationAccuracy.medium,
-          timeLimit: Duration(seconds: attempts == 0 ? 15 : 10),
+          desiredAccuracy: LocationAccuracy.best,
+          timeLimit: Duration(seconds: 20),
         );
 
         print('Attempt ${attempts + 1}: accuracy ${position.accuracy}m');
-
-        if (position.accuracy <= 50) {
-          bestPosition = position;
-          print('Good accuracy achieved: ${position.accuracy}m');
-          break;
-        }
 
         if (bestPosition == null || position.accuracy < bestPosition.accuracy) {
           bestPosition = position;
         }
 
-        attempts++;
-
-        if (attempts < maxAttempts && position.accuracy > 100) {
-          await Future.delayed(const Duration(seconds: 2));
-        } else if (attempts < maxAttempts) {
+        if (position.accuracy <= targetAccuracy) {
+          print('Excellent accuracy achieved: ${position.accuracy}m');
           break;
+        }
+
+        attempts++;
+        if (attempts < maxAttempts) {
+          await Future.delayed(const Duration(seconds: 1));
         }
       } catch (e) {
         print('Attempt ${attempts + 1} failed: $e');
@@ -149,9 +144,7 @@ class _LocationScreenState extends State<LocationScreen> {
     _distance = distanceInMeters;
     print('Distance: $distanceInMeters meters');
 
-    final threshold = bestPosition.accuracy <= 50
-        ? 100.0
-        : 100.0 + (bestPosition.accuracy * 0.5);
+    final threshold = 150.0 + (bestPosition.accuracy * 1.5);
     print('Threshold: $threshold meters (accuracy: ${bestPosition.accuracy}m)');
 
     return distanceInMeters <= threshold;
