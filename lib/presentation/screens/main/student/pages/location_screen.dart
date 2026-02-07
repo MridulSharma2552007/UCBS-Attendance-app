@@ -30,6 +30,11 @@ class _LocationScreenState extends State<LocationScreen> {
     _checkLocation();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   Future<void> _checkLocation() async {
     setState(() {
       _isLoading = true;

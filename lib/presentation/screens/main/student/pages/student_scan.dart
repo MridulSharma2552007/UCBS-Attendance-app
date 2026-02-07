@@ -5,9 +5,12 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:ucbs_attendance_app/core/constants/app_constants.dart';
 import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 import 'package:ucbs_attendance_app/data/services/supabase/Student/compare_vector.dart';
+import 'package:ucbs_attendance_app/data/services/supabase/Student/mark_attendance.dart';
+import 'package:ucbs_attendance_app/presentation/providers/Data/user_session.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/colors/student_theme.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 
@@ -176,8 +179,40 @@ class _StudentScanState extends State<StudentScan>
         });
         return;
       }
+      if (isMatch) {
+        MarkAttendance markAttendance = MarkAttendance();
+        final sem = StorageService.getInt('semester');
+        final subject = context.read<UserSession>().subject;
 
-      // Success - Show success screen
+        if (subject == null) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  "Subject not selected. Please go back and select a class.",
+                ),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+          return;
+        }
+
+        if (sem == null) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Semester not found. Please login again."),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+          return;
+        }
+
+        await markAttendance.markAttendance(rollNo, sem, subject);
+      }
+
       if (mounted) {
         _showSuccessScreen();
       }

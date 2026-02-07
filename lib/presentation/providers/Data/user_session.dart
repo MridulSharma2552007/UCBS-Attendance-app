@@ -7,6 +7,7 @@ class UserSession extends ChangeNotifier {
   String? sem;
   String? email;
   int? employeeid;
+  String? subject;
 
   void setrole(String value) {
     role = value;
@@ -35,6 +36,12 @@ class UserSession extends ChangeNotifier {
 
   void setEmployeeId(int value) {
     employeeid = value;
+    notifyListeners();
+  }
+
+  void selectedClass(String value) {
+    subject = value;
+    print('*********selected class********: $subject');
     notifyListeners();
   }
 

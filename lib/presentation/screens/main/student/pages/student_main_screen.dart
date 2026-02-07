@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 import 'package:ucbs_attendance_app/data/services/supabase/Student/fetch_live_classes.dart';
+import 'package:ucbs_attendance_app/presentation/providers/Data/user_session.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/colors/student_theme.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/pages/location_screen.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/charts/weekly_attendance_chart.dart';
@@ -353,6 +355,14 @@ class _StudentMainScreenState extends State<StudentMainScreen> {
                                     ),
                                   );
                                 } else {
+                                  if (classData['subjectName'] != null) {
+                                    context.read<UserSession>().selectedClass(
+                                      classData['subjectName'],
+                                    );
+                                    print(
+                                      'Subject set: ${classData['subjectName']}',
+                                    );
+                                  }
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
