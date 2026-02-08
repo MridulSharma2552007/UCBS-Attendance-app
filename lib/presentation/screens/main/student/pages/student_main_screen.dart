@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 import 'package:ucbs_attendance_app/data/services/supabase/Student/fetch_live_classes.dart';
 import 'package:ucbs_attendance_app/data/services/supabase/Student/get_attendance.dart';
+import 'package:ucbs_attendance_app/data/services/supabase/Student/get_student_count.dart';
 import 'package:ucbs_attendance_app/presentation/providers/Data/user_session.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/colors/student_theme.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/pages/location_screen.dart';
@@ -22,6 +23,7 @@ class _StudentMainScreenState extends State<StudentMainScreen>
     with WidgetsBindingObserver {
   late FetchLiveClasses _liveClassesService;
   late GetAttendance _attendanceService;
+  late GetStudentCount _studentCountService;
 
   @override
   void initState() {
@@ -29,6 +31,7 @@ class _StudentMainScreenState extends State<StudentMainScreen>
     WidgetsBinding.instance.addObserver(this);
     _liveClassesService = FetchLiveClasses();
     _attendanceService = GetAttendance();
+    _studentCountService = GetStudentCount();
   }
 
   @override
@@ -368,27 +371,36 @@ class _StudentMainScreenState extends State<StudentMainScreen>
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Attendance Tracking',
-                                        style: GoogleFonts.inter(
-                                          fontSize: 12,
-                                          color: Colors.white.withOpacity(0.8),
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        '84% Presence',
-                                        style: GoogleFonts.plusJakartaSans(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
+                                  child: StreamBuilder<int>(
+                                    stream: _studentCountService
+                                        .getStudentCountStream(classData['id']),
+                                    builder: (context, snapshot) {
+                                      final count = snapshot.data ?? 0;
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Students Present',
+                                            style: GoogleFonts.inter(
+                                              fontSize: 12,
+                                              color: Colors.white.withOpacity(
+                                                0.8,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: 4),
+                                          Text(
+                                            '$count Students',
+                                            style: GoogleFonts.plusJakartaSans(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
                                   ),
                                 ),
                                 GestureDetector(
@@ -531,7 +543,7 @@ class _StudentMainScreenState extends State<StudentMainScreen>
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        Icons.sync_alt,
+                        Icons.contactless_rounded,
                         color: Colors.white,
                         size: 20,
                       ),
