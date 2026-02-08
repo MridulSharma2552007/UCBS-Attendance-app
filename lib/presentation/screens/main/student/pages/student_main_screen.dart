@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 import 'package:ucbs_attendance_app/data/services/supabase/Student/fetch_live_classes.dart';
+import 'package:ucbs_attendance_app/data/services/supabase/Student/get_attendance.dart';
 import 'package:ucbs_attendance_app/presentation/providers/Data/user_session.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/colors/student_theme.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/pages/location_screen.dart';
@@ -17,14 +18,37 @@ class StudentMainScreen extends StatefulWidget {
   State<StudentMainScreen> createState() => _StudentMainScreenState();
 }
 
-class _StudentMainScreenState extends State<StudentMainScreen> {
+class _StudentMainScreenState extends State<StudentMainScreen> with WidgetsBindingObserver {
   List<Map<String, dynamic>> liveClasses = [];
+  List<Map<String, dynamic>> attendanceData = [];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadLiveClasses();
+    _loadAttendance();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadAttendance();
+    }
+  }
+
+  Future<void> _loadAttendance() async {
+    final data = await GetAttendance().getAttendance(StorageService.getString('roll_no')!);
+    setState(() {
+      attendanceData = data;
+    });
   }
 
   Future<void> _loadLiveClasses() async {
@@ -48,7 +72,7 @@ class _StudentMainScreenState extends State<StudentMainScreen> {
             SizedBox(height: 10),
             _buildHeader(),
             SizedBox(height: 40),
-            WeeklyAttendanceChart(),
+            WeeklyAttendanceChart(attendanceData: attendanceData),
             SizedBox(height: 40),
             Text(
               'Live Classes.',

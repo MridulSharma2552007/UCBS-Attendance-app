@@ -1,12 +1,10 @@
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ucbs_attendance_app/core/constants/app_constants.dart';
 import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 import 'package:ucbs_attendance_app/data/services/Firebase/sign_in_with_google.dart';
 import 'package:ucbs_attendance_app/presentation/providers/Data/user_session.dart';
 import 'package:ucbs_attendance_app/presentation/screens/login/Shared/login.dart';
-import 'package:ucbs_attendance_app/presentation/screens/login/Teacher/sign_in_teacher.dart';
 
 class AuthService {
   static final _googleAuth = SignInWithGoogle();

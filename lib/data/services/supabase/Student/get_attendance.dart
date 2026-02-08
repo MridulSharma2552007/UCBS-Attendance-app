@@ -7,6 +7,7 @@ class GetAttendance {
         .from('attendance_logs')
         .select()
         .eq('roll_no', roll_no);
+    print(response);
     return response;
   }
 }
