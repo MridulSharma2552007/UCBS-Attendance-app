@@ -26,7 +26,6 @@ class _StudentScanState extends State<StudentScan>
   CameraController? _controller;
   Future<void>? _initializeControllerFuture;
   List<CameraDescription>? _cameras;
-  AnimationController? _typingController;
   String _displayedText = '';
   final String _fullText =
       "🔒 We're not storing your photo. Only extracting 512D face vectors. No one can see your photo, not even us.";
@@ -183,7 +182,7 @@ class _StudentScanState extends State<StudentScan>
         MarkAttendance markAttendance = MarkAttendance();
         final sem = StorageService.getInt('semester');
         final subject = context.read<UserSession>().subject;
-
+        final subject_id = context.read<UserSession>().subject_id;
         if (subject == null) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -210,7 +209,7 @@ class _StudentScanState extends State<StudentScan>
           return;
         }
 
-        await markAttendance.markAttendance(rollNo, sem, subject);
+        await markAttendance.markAttendance(rollNo, sem, subject, subject_id!);
       }
 
       if (mounted) {
@@ -231,7 +230,6 @@ class _StudentScanState extends State<StudentScan>
   @override
   void dispose() {
     _controller?.dispose();
-    _typingController?.dispose();
     super.dispose();
   }
 
@@ -244,7 +242,7 @@ class _StudentScanState extends State<StudentScan>
 
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
-        Navigator.of(context).pop();
+        Navigator.pop(context, true);
       }
     });
   }

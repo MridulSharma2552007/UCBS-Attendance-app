@@ -210,11 +210,14 @@ class _LocationScreenState extends State<LocationScreen> {
 
   Widget _buildNextButton() {
     return GestureDetector(
-      onTap: () {
-        Navigator.pushReplacement(
+      onTap: () async {
+        final result = await Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => StudentScan()),
         );
+        if (result == true && mounted) {
+          Navigator.pop(context, true);
+        }
       },
       child: Container(
         width: double.infinity,

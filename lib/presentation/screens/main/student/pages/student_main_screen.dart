@@ -18,7 +18,8 @@ class StudentMainScreen extends StatefulWidget {
   State<StudentMainScreen> createState() => _StudentMainScreenState();
 }
 
-class _StudentMainScreenState extends State<StudentMainScreen> with WidgetsBindingObserver {
+class _StudentMainScreenState extends State<StudentMainScreen>
+    with WidgetsBindingObserver {
   List<Map<String, dynamic>> liveClasses = [];
   List<Map<String, dynamic>> attendanceData = [];
   bool isLoading = true;
@@ -46,19 +47,22 @@ class _StudentMainScreenState extends State<StudentMainScreen> with WidgetsBindi
   }
 
   Future<void> _loadAttendance() async {
-    final data = await GetAttendance().getAttendance(StorageService.getString('roll_no')!);
+    final data = await GetAttendance().getAttendance(
+      StorageService.getString('roll_no')!,
+    );
     setState(() {
       attendanceData = data;
     });
   }
 
   Future<void> _loadLiveClasses() async {
-    final sem = StorageService.getInt('semester').toString();
     final classes = await FetchLiveClasses().fetchLiveClasses();
-    setState(() {
-      liveClasses = classes;
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        liveClasses = classes;
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -92,10 +96,77 @@ class _StudentMainScreenState extends State<StudentMainScreen> with WidgetsBindi
     );
   }
 
+  Widget _buildSkeletonBox(double width, double height) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(8),
+      ),
+    );
+  }
+
   Widget _buildLiveClasses() {
     if (isLoading) {
-      return Center(
-        child: CircularProgressIndicator(color: StudentTheme.accentcoral),
+      return Column(
+        children: List.generate(
+          2,
+          (index) => Container(
+            margin: EdgeInsets.only(bottom: 8),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(32),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSkeletonBox(80, 20),
+                          SizedBox(height: 20),
+                          _buildSkeletonBox(double.infinity, 60),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: StudentTheme.accentcoral.withOpacity(0.1),
+                        borderRadius: BorderRadius.vertical(
+                          bottom: Radius.circular(32),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSkeletonBox(100, 20),
+                          SizedBox(height: 20),
+                          _buildSkeletonBox(double.infinity, 50),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       );
     }
 
@@ -383,6 +454,7 @@ class _StudentMainScreenState extends State<StudentMainScreen> with WidgetsBindi
                                   if (classData['subjectName'] != null) {
                                     context.read<UserSession>().selectedClass(
                                       classData['subjectName'],
+                                      classData['id'],
                                     );
                                     print(
                                       'Subject set: ${classData['subjectName']}',
@@ -393,7 +465,12 @@ class _StudentMainScreenState extends State<StudentMainScreen> with WidgetsBindi
                                     MaterialPageRoute(
                                       builder: (context) => LocationScreen(),
                                     ),
-                                  );
+                                  ).then((result) {
+                                    if (result == true) {
+                                      _loadLiveClasses();
+                                      _loadAttendance();
+                                    }
+                                  });
                                 }
                               },
                               child: Container(
