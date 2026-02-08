@@ -40,6 +40,7 @@ class _StudentMainScreenState extends State<StudentMainScreen> with WidgetsBindi
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      _loadLiveClasses();
       _loadAttendance();
     }
   }
