@@ -485,12 +485,12 @@ class _StudentMainScreenState extends State<StudentMainScreen>
                                     ),
                                     decoration: BoxDecoration(
                                       color: isJoined
-                                          ? Colors.green.withOpacity(0.3)
-                                          : Colors.white.withOpacity(0.2),
+                                          ? AppColors.success
+                                          : Colors.white.withOpacity(0.15),
                                       borderRadius: BorderRadius.circular(20),
                                       border: Border.all(
                                         color: isJoined
-                                            ? Colors.green
+                                            ? AppColors.success
                                             : Colors.white.withOpacity(0.3),
                                       ),
                                     ),
@@ -500,7 +500,7 @@ class _StudentMainScreenState extends State<StudentMainScreen>
                                         if (isJoined)
                                           Icon(
                                             Icons.check_circle,
-                                            color: Colors.green,
+                                            color: Colors.white,
                                             size: 14,
                                           ),
                                         if (isJoined) SizedBox(width: 4),
@@ -510,7 +510,7 @@ class _StudentMainScreenState extends State<StudentMainScreen>
                                             fontSize: 10,
                                             fontWeight: FontWeight.bold,
                                             color: isJoined
-                                                ? Colors.green
+                                                ? Colors.white
                                                 : Colors.white,
                                             letterSpacing: 1.2,
                                           ),
