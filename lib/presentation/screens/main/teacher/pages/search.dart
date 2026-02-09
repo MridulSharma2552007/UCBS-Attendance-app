@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ucbs_attendance_app/data/services/supabase/Teacher/search_student.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/teacher/pages/student_info.dart';
 
@@ -15,10 +15,10 @@ class Search extends StatefulWidget {
 class _SearchState extends State<Search> {
   final PageController _pageController = PageController();
   final TextEditingController _searchController = TextEditingController();
+  final SearchStudentService _searchService = SearchStudentService();
 
   bool isLoading = false;
   bool hasSearched = false;
-  final client = Supabase.instance.client;
   List<Map<String, dynamic>> searchResults = [];
 
   Future<void> searchuser() async {
@@ -32,13 +32,9 @@ class _SearchState extends State<Search> {
     HapticFeedback.lightImpact();
 
     try {
-      final response = await client
-          .from('students')
-          .select()
-          .eq('roll_no', _searchController.text);
-
+      final results = await _searchService.searchByRollNo(_searchController.text);
       setState(() {
-        searchResults = List<Map<String, dynamic>>.from(response);
+        searchResults = results;
         isLoading = false;
       });
     } catch (e) {
