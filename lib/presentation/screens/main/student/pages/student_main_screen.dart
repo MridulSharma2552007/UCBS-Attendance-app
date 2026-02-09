@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 import 'package:ucbs_attendance_app/data/services/supabase/Student/fetch_live_classes.dart';
 import 'package:ucbs_attendance_app/data/services/supabase/Student/get_attendance.dart';
@@ -24,6 +25,7 @@ class _StudentMainScreenState extends State<StudentMainScreen>
   late FetchLiveClasses _liveClassesService;
   late GetAttendance _attendanceService;
   late GetStudentCount _studentCountService;
+  final client = Supabase.instance.client;
 
   @override
   void initState() {
@@ -74,7 +76,7 @@ class _StudentMainScreenState extends State<StudentMainScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Live Classes.',
+                  'Live Classes',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -238,6 +240,15 @@ class _StudentMainScreenState extends State<StudentMainScreen>
                                 ),
                                 Row(
                                   children: [
+                                    Text(
+                                      'ID: ${classData['id']}',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black54,
+                                      ),
+                                    ),
+                                    SizedBox(width: 12),
                                     Text(
                                       classData['sem'] == 1
                                           ? 'Rm 101'
@@ -406,7 +417,7 @@ class _StudentMainScreenState extends State<StudentMainScreen>
                                 GestureDetector(
                                   onTap: isJoined
                                       ? null
-                                      : () {
+                                      : () async {
                                           final studentSem =
                                               StorageService.getInt('semester');
                                           if (studentSem != classData['sem']) {
@@ -460,22 +471,89 @@ class _StudentMainScreenState extends State<StudentMainScreen>
                                               ),
                                             );
                                           } else {
-                                            if (classData['subjectName'] !=
-                                                null) {
-                                              context
-                                                  .read<UserSession>()
-                                                  .selectedClass(
-                                                    classData['subjectName'],
-                                                    classData['id'],
-                                                  );
+                                            bool alreadyInClass = attendanceData
+                                                .any(
+                                                  (a) => liveClasses.any(
+                                                    (lc) =>
+                                                        lc['id'] ==
+                                                            a['subject_id'] &&
+                                                        lc['is_activated'] ==
+                                                            true,
+                                                  ),
+                                                );
+
+                                            if (alreadyInClass) {
+                                              showDialog(
+                                                context: context,
+                                                builder: (context) => AlertDialog(
+                                                  backgroundColor:
+                                                      Colors.grey[900],
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                  ),
+                                                  title: Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons
+                                                            .info_outline_rounded,
+                                                        color: Colors.blue,
+                                                        size: 28,
+                                                      ),
+                                                      SizedBox(width: 12),
+                                                      Text(
+                                                        'Already in Class',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  content: Text(
+                                                    'You are already in a class. You can join another when the teacher ends this class.',
+                                                    style: TextStyle(
+                                                      color: Colors.white70,
+                                                      fontSize: 15,
+                                                    ),
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(
+                                                            context,
+                                                          ),
+                                                      child: Text(
+                                                        'OK',
+                                                        style: TextStyle(
+                                                          color: Colors.blue,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            } else {
+                                              if (classData['subjectName'] !=
+                                                  null) {
+                                                context
+                                                    .read<UserSession>()
+                                                    .selectedClass(
+                                                      classData['subjectName'],
+                                                      classData['id'],
+                                                    );
+                                              }
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      LocationScreen(),
+                                                ),
+                                              );
                                             }
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    LocationScreen(),
-                                              ),
-                                            );
                                           }
                                         },
                                   child: Container(
