@@ -107,5 +107,5 @@ Basically:
 
 If you read till here, you are either very interested in the project…  
 or **extremely bored**.  
-its mre parul verma
+its me parul verma
 
