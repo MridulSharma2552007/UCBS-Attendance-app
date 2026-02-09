@@ -333,3 +333,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **`[ MADE WITH 🔥 BY MRIDUL SHARMA | © 2025 UCBS ATTENDANCE APP ]`**
 
 </div>
+Pull request created by Pihu.
