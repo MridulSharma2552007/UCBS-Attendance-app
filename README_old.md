@@ -107,6 +107,5 @@ Basically:
 
 If you read till here, you are either very interested in the project…  
 or **extremely bored**.  
-
-yup you are right I am totally bore.
+Yup you are right I am **totally bore**.
 
