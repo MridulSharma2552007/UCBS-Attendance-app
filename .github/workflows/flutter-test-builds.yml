@@ -12,40 +12,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          cache: true
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-
-      - name: Install Flutter (stable)
-        run: |
-          git clone https://github.com/flutter/flutter.git --depth 1 -b stable
-          export PATH="$PWD/flutter/bin:$PATH"
-          echo "$PWD/flutter/bin" >> $GITHUB_PATH
-          flutter doctor
-          flutter --version
+          cache: gradle
 
       - name: Create .env file with secrets
         run: |
-          cat << EOF > .env
-          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
-          FACE_API_URL=${{ secrets.FACE_API_URL }}
-          EOF
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build APK (release)
-        run: flutter build apk --release
-
-      - name: Rename APK
-        run: mv build/app/outputs/flutter-apk/app-release.apk UCBS-Attendance-${{ github.ref_name }}.apk
+        run: flutter build apk --release --no-tree-shake-icons
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: UCBS-Attendance-${{ github.ref_name }}.apk
+          files: build/app/outputs/flutter-apk/app-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
