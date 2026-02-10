@@ -11,6 +11,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Cashe Flutter SDK
+        uses: actions/cache@v4
+	with:
+	   path: flutter
+	   key: flutter-sdk-stable
+	
+      - name: Cache Pub dependencies
+	uses: 	action/cache@v4
+	with:
+	    path: ~/.pub-cache
+	    key: pub-cache-$({ hashFiles('**/pubspec.lock' )})
+	    restore-keys: pub-cache-
+      
+      -name: Cache Gradel
+       uses: action/cache@v4
+       with:
+	  path: ~/.gradle
+          key: gradel-cache-$({ runner.os })
 
       - name: Setup Java
         uses: actions/setup-java@v4
