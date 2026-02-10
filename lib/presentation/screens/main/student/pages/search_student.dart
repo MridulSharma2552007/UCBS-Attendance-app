@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:skeletonizer/skeletonizer.dart';
+
 import 'package:ucbs_attendance_app/data/services/supabase/Teacher/search_student.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/colors/student_theme.dart';
 
@@ -106,19 +106,16 @@ class _SearchStudentState extends State<SearchStudent>
             SizedBox(height: 20),
             _buildSearchField(_searchController, searchStudent),
             SizedBox(height: 20),
-            Skeletonizer(
-              enabled: isLoading,
-              child: Expanded(
-                child: ListView.builder(
-                  itemCount: isLoading ? 5 : searchResults.length,
-                  itemBuilder: (context, index) {
-                    if (isLoading) {
-                      return _buildSkeletonCard();
-                    }
-                    final student = searchResults[index];
-                    return _buildStudentCard(student, index);
-                  },
-                ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: isLoading ? 5 : searchResults.length,
+                itemBuilder: (context, index) {
+                  if (isLoading) {
+                    return _buildSkeletonCard();
+                  }
+                  final student = searchResults[index];
+                  return _buildStudentCard(student, index);
+                },
               ),
             ),
           ],
