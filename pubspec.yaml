@@ -53,6 +53,7 @@ dependencies:
   latlong2: ^0.9.1
   rxdart: ^0.27.7
   webview_flutter: ^4.4.2
+  pdfx: ^2.5.0
 
  
 

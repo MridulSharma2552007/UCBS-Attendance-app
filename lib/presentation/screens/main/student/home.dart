@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/Navigation/snav_bar.dart';
-import 'package:ucbs_attendance_app/presentation/screens/main/student/pages/enroll_class.dart';
+import 'package:ucbs_attendance_app/presentation/screens/main/student/pages/study_material.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/pages/profile_screen_student.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/pages/search_student.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/pages/student_main_screen.dart';
@@ -18,7 +18,7 @@ class _HomeState extends State<Home> {
   final List<Widget> _pages = [
     StudentMainScreen(),
     SearchStudent(),
-    EnrollClass(),
+    StudyMaterial(),
     ProfileScreenStudent(),
   ];
   @override
