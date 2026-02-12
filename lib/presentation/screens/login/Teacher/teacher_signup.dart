@@ -25,6 +25,7 @@ class _TeacherLoginState extends State<TeacherLogin> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
       setState(() => opacity = 1.0);
     });
   }
@@ -64,6 +65,14 @@ class FrostedLogicCard extends StatefulWidget {
 class _FrostedLogicCardState extends State<FrostedLogicCard> {
   final TextEditingController namecontroller = TextEditingController();
   final TextEditingController employeeidcontroller = TextEditingController();
+
+  @override
+  void dispose() {
+    namecontroller.dispose();
+    employeeidcontroller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     bool keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
