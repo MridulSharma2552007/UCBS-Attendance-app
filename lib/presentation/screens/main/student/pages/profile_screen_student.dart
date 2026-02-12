@@ -197,6 +197,7 @@ class _ProfileScreenStudentState extends State<ProfileScreenStudent> {
   Widget _buildSubjectChart(Map<String, int> subjectMap) {
     final subjects = subjectMap.keys.toList();
     final counts = subjectMap.values.toList();
+    final chartWidth = (subjects.length * 80).toDouble();
 
     return Container(
       padding: EdgeInsets.all(20),
@@ -218,62 +219,66 @@ class _ProfileScreenStudentState extends State<ProfileScreenStudent> {
             ),
           ),
           SizedBox(height: 20),
-          SizedBox(
-            height: 200,
-            child: BarChart(
-              BarChartData(
-                alignment: BarChartAlignment.spaceAround,
-                maxY:
-                    (counts.isNotEmpty
-                            ? counts.reduce((a, b) => a > b ? a : b)
-                            : 5)
-                        .toDouble() +
-                    1,
-                barTouchData: BarTouchData(enabled: false),
-                titlesData: FlTitlesData(
-                  show: true,
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        if (value.toInt() >= subjects.length)
-                          return SizedBox.shrink();
-                        return Padding(
-                          padding: EdgeInsets.only(top: 8),
-                          child: Text(
-                            subjects[value.toInt()].length > 10
-                                ? '${subjects[value.toInt()].substring(0, 10)}...'
-                                : subjects[value.toInt()],
-                            style: GoogleFonts.inter(fontSize: 9),
-                          ),
-                        );
-                      },
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: chartWidth > 300 ? chartWidth : 300,
+              height: 200,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY:
+                      (counts.isNotEmpty
+                              ? counts.reduce((a, b) => a > b ? a : b)
+                              : 5)
+                          .toDouble() +
+                      1,
+                  barTouchData: BarTouchData(enabled: false),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          if (value.toInt() >= subjects.length)
+                            return SizedBox.shrink();
+                          return Padding(
+                            padding: EdgeInsets.only(top: 8),
+                            child: Text(
+                              subjects[value.toInt()].length > 10
+                                  ? '${subjects[value.toInt()].substring(0, 10)}...'
+                                  : subjects[value.toInt()],
+                              style: GoogleFonts.inter(fontSize: 9),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
                     ),
                   ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  topTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                ),
-                gridData: FlGridData(show: false),
-                borderData: FlBorderData(show: false),
-                barGroups: List.generate(
-                  subjects.length,
-                  (index) => BarChartGroupData(
-                    x: index,
-                    barRods: [
-                      BarChartRodData(
-                        toY: counts[index].toDouble(),
-                        color: StudentTheme.accentcoral,
-                        width: 40,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ],
+                  gridData: FlGridData(show: false),
+                  borderData: FlBorderData(show: false),
+                  barGroups: List.generate(
+                    subjects.length,
+                    (index) => BarChartGroupData(
+                      x: index,
+                      barRods: [
+                        BarChartRodData(
+                          toY: counts[index].toDouble(),
+                          color: StudentTheme.accentcoral,
+                          width: 40,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -293,6 +298,7 @@ class _ProfileScreenStudentState extends State<ProfileScreenStudent> {
     final dates = sortedEntries.map((e) => e.key).toList();
     final counts = sortedEntries.map((e) => e.value).toList();
     final formattedDates = dates.map((d) => _formatDate(d)).toList();
+    final chartWidth = (dates.length * 80).toDouble();
 
     return Container(
       padding: EdgeInsets.all(20),
@@ -314,71 +320,75 @@ class _ProfileScreenStudentState extends State<ProfileScreenStudent> {
             ),
           ),
           SizedBox(height: 20),
-          SizedBox(
-            height: 200,
-            child: BarChart(
-              BarChartData(
-                alignment: BarChartAlignment.spaceAround,
-                maxY:
-                    (counts.isNotEmpty
-                            ? counts.reduce((a, b) => a > b ? a : b)
-                            : 5)
-                        .toDouble() +
-                    1,
-                barTouchData: BarTouchData(
-                  enabled: true,
-                  touchTooltipData: BarTouchTooltipData(
-                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                      final dateKey = dates[groupIndex];
-                      final subjects = dailySubjectsMap[dateKey] ?? [];
-                      final subjectText = subjects.join(', ');
-                      return BarTooltipItem(
-                        '${formattedDates[groupIndex]}\n${rod.toY.toInt()} classes\n$subjectText',
-                        GoogleFonts.inter(color: Colors.white, fontSize: 11),
-                      );
-                    },
-                  ),
-                ),
-                titlesData: FlTitlesData(
-                  show: true,
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        final index = value.toInt();
-                        if (index < 0 || index >= formattedDates.length)
-                          return SizedBox.shrink();
-                        return Text(
-                          formattedDates[index],
-                          style: GoogleFonts.inter(fontSize: 9),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: chartWidth > 300 ? chartWidth : 300,
+              height: 200,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY:
+                      (counts.isNotEmpty
+                              ? counts.reduce((a, b) => a > b ? a : b)
+                              : 5)
+                          .toDouble() +
+                      1,
+                  barTouchData: BarTouchData(
+                    enabled: true,
+                    touchTooltipData: BarTouchTooltipData(
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        final dateKey = dates[groupIndex];
+                        final subjects = dailySubjectsMap[dateKey] ?? [];
+                        final subjectText = subjects.join(', ');
+                        return BarTooltipItem(
+                          '${formattedDates[groupIndex]}\n${rod.toY.toInt()} classes\n$subjectText',
+                          GoogleFonts.inter(color: Colors.white, fontSize: 11),
                         );
                       },
                     ),
                   ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  topTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                ),
-                gridData: FlGridData(show: false),
-                borderData: FlBorderData(show: false),
-                barGroups: List.generate(
-                  dates.length,
-                  (index) => BarChartGroupData(
-                    x: index,
-                    barRods: [
-                      BarChartRodData(
-                        toY: counts[index].toDouble(),
-                        color: StudentTheme.accentcoral,
-                        width: 40,
-                        borderRadius: BorderRadius.circular(8),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          final index = value.toInt();
+                          if (index < 0 || index >= formattedDates.length)
+                            return SizedBox.shrink();
+                          return Text(
+                            formattedDates[index],
+                            style: GoogleFonts.inter(fontSize: 9),
+                          );
+                        },
                       ),
-                    ],
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  gridData: FlGridData(show: false),
+                  borderData: FlBorderData(show: false),
+                  barGroups: List.generate(
+                    dates.length,
+                    (index) => BarChartGroupData(
+                      x: index,
+                      barRods: [
+                        BarChartRodData(
+                          toY: counts[index].toDouble(),
+                          color: StudentTheme.accentcoral,
+                          width: 40,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
