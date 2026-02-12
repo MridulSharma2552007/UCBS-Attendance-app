@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:html' as html show File;
 
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
@@ -102,13 +101,7 @@ class _StudentScanState extends State<StudentScan>
         Uri.parse(AppConstants.detectEndpoint),
       );
 
-      if (kIsWeb) {
-        final bytes = await _image!.readAsBytes();
-        request.files.add(http.MultipartFile.fromBytes('file', bytes,
-            filename: 'capture.jpg'));
-      } else {
-        request.files.add(await http.MultipartFile.fromPath('file', path));
-      }
+      request.files.add(await http.MultipartFile.fromPath('file', path));
 
       final response = await request.send().timeout(
         const Duration(seconds: 30),
