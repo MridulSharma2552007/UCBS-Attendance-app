@@ -5,6 +5,10 @@ on:
     tags:
       - "v*.*.*"
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,16 +19,18 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '17'
+          cache: gradle
 
-      - name: Install Flutter (stable)
-        run: |
-          git clone https://github.com/flutter/flutter.git --depth 1 -b stable
-          export PATH="$PWD/flutter/bin:$PATH"
-          echo "$PWD/flutter/bin" >> $GITHUB_PATH
-          flutter doctor
-          flutter --version
+      - name: Setup Flutter (stable)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter version
+        run: flutter --version
 
       - name: Create .env file with secrets
         run: |
