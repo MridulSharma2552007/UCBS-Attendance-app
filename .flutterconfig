@@ -1,0 +1,11 @@
+# Flutter Web Build Configuration
+# WASM: Better performance for heavy computation (face recognition)
+# JS: Better browser compatibility
+
+[web]
+# Enable WASM by default for better performance
+wasm=true
+
+# Optimization flags
+dart2js-optimization=O4
+enable-dart-dev-compiler=false

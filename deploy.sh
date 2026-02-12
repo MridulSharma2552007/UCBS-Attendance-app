@@ -6,8 +6,19 @@ echo "
 ╚══════════════════════════════════════╝
 "
 
-echo "🔨 Building Flutter web app..."
-flutter build web --release
+# Default to WASM, allow override with argument
+BUILD_TYPE=${1:-wasm}
+
+if [ "$BUILD_TYPE" = "js" ]; then
+    echo "🔨 Building Flutter web app (JavaScript)..."
+    flutter build web --release
+elif [ "$BUILD_TYPE" = "wasm" ]; then
+    echo "🔨 Building Flutter web app (WASM)..."
+    flutter build web --release --wasm
+else
+    echo "❌ Invalid build type. Use 'js' or 'wasm'"
+    exit 1
+fi
 
 if [ $? -eq 0 ]; then
     echo "

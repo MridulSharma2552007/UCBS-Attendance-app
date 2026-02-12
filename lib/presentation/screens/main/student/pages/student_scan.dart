@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:html' as html show File;
 
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
@@ -100,9 +102,20 @@ class _StudentScanState extends State<StudentScan>
         Uri.parse(AppConstants.detectEndpoint),
       );
 
-      request.files.add(await http.MultipartFile.fromPath('file', path));
+      if (kIsWeb) {
+        final bytes = await _image!.readAsBytes();
+        request.files.add(http.MultipartFile.fromBytes('file', bytes,
+            filename: 'capture.jpg'));
+      } else {
+        request.files.add(await http.MultipartFile.fromPath('file', path));
+      }
 
-      final response = await request.send();
+      final response = await request.send().timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          throw Exception('Request timeout - server may be down');
+        },
+      );
       final body = await response.stream.bytesToString();
       final decoded = jsonDecode(body);
 
@@ -217,11 +230,11 @@ class _StudentScanState extends State<StudentScan>
       }
     } catch (e) {
       debugPrint("Upload error: $e");
-      setState(() {
-        _uploading = false;
-        _image = null;
-      });
       if (mounted) {
+        setState(() {
+          _uploading = false;
+          _image = null;
+        });
         _showServerErrorDialog();
       }
     }
@@ -402,16 +415,18 @@ class _StudentScanState extends State<StudentScan>
                     );
                   }
 
-                  final size = MediaQuery.of(context).size;
-                  final scale =
-                      1 / (_controller!.value.aspectRatio * size.aspectRatio);
-
                   return Stack(
                     fit: StackFit.expand,
                     children: [
-                      Transform.scale(
-                        scale: scale,
-                        child: Center(child: CameraPreview(_controller!)),
+                      SizedBox.expand(
+                        child: FittedBox(
+                          fit: BoxFit.cover,
+                          child: SizedBox(
+                            width: _controller!.value.previewSize?.width ?? 1,
+                            height: _controller!.value.previewSize?.height ?? 1,
+                            child: CameraPreview(_controller!),
+                          ),
+                        ),
                       ),
                       Container(
                         decoration: BoxDecoration(
