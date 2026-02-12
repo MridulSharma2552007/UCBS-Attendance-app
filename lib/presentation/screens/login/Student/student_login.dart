@@ -29,6 +29,7 @@ class _StudentLoginState extends State<StudentLogin> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
       setState(() => opacity = 1.0);
     });
   }
