@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "654699958000-r4j7eg010ehq62l2tj069r7topm3pdea.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ucbs_attendance_app",
+            "certificate_hash": "4f69672305c0731ee10c3b95f742acfc12d7fb9a"
+          }
+        },
+        {
           "client_id": "654699958000-13u9a32ai0it3ibi0ask42jp0c9t3apa.apps.googleusercontent.com",
           "client_type": 3
         }
