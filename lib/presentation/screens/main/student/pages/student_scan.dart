@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
@@ -14,6 +13,12 @@ import 'package:ucbs_attendance_app/data/services/supabase/Student/mark_attendan
 import 'package:ucbs_attendance_app/presentation/providers/Data/user_session.dart';
 import 'package:ucbs_attendance_app/presentation/screens/main/student/colors/student_theme.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
+
+// Web-specific imports
+import 'package:ucbs_attendance_app/presentation/widgets/web/web_camera_widget.dart'
+    if (dart.library.io) 'package:ucbs_attendance_app/presentation/widgets/web/web_camera_stub.dart';
+import 'package:ucbs_attendance_app/presentation/screens/login/Shared/web_helper.dart'
+    if (dart.library.io) 'package:ucbs_attendance_app/presentation/screens/login/Shared/web_helper_stub.dart';
 
 class StudentScan extends StatefulWidget {
   const StudentScan({super.key});
