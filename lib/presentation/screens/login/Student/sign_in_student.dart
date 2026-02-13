@@ -97,30 +97,39 @@ class FrostedLogicCard extends StatelessWidget {
                 const SizedBox(height: 30),
                 GestureDetector(
                   onTap: () async {
-                    final user = await SignInWithGoogle().signIn();
-                    if (user != null && user.email != null) {
-                      debugPrint('Signed in as Student: ${user.email}');
-                      final studentData = await VerifiedStudent()
-                          .getStudentData(user.email!);
-                      if (studentData != null) {
-                        debugPrint('Student found: $studentData');
-                        AuthService.SignInStudent(context, studentData);
-                        print('Signed in as Student: ${user.email}');
-                        if (!context.mounted) return;
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const Home()),
-                        );
-                      } else {
-                        SnackBar snackBar = const SnackBar(
-                          content: Text(
-                            'No student record found. Please sign up.',
-                          ),
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        final googleinstance = SignInWithGoogle();
-                        await googleinstance.signOut();
+                    try {
+                      final user = await SignInWithGoogle().signIn();
+                      if (user != null && user.email != null) {
+                        debugPrint('Signed in as Student: ${user.email}');
+                        final studentData = await VerifiedStudent()
+                            .getStudentData(user.email!);
+                        if (studentData != null) {
+                          debugPrint('Student found: $studentData');
+                          AuthService.SignInStudent(context, studentData);
+                          print('Signed in as Student: ${user.email}');
+                          if (!context.mounted) return;
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const Home()),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('No student record found. Please sign up.'),
+                              backgroundColor: Colors.redAccent,
+                            ),
+                          );
+                          final googleinstance = SignInWithGoogle();
+                          await googleinstance.signOut();
+                        }
                       }
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error: ${e.toString()}'),
+                          backgroundColor: Colors.redAccent,
+                        ),
+                      );
                     }
                   },
                   child: GoogleSignIn(),
