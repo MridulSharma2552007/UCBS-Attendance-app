@@ -32,7 +32,10 @@ jobs:
       - name: Flutter version
         run: flutter --version
       - name: Decode google-services.json
-        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > android/app/google-services.json
+        run: |
+          cat > android/app/google-services.json << 'EOF'
+          ${{ secrets.GOOGLE_SERVICES_JSON }}
+          EOF
 
 
       - name: Create .env file with secrets
