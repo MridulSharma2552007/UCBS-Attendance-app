@@ -51,3 +51,4 @@ app.*.map.json
 
 
 .vercel
+android/app/google-services.json
