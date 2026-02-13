@@ -6,7 +6,6 @@ import 'dart:async';
 
 class StartClass extends StatefulWidget {
   final List<Map<String, dynamic>> subjects;
-
   const StartClass({super.key, required this.subjects});
 
   @override
