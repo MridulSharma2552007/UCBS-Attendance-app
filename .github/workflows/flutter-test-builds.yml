@@ -31,12 +31,21 @@ jobs:
 
       - name: Flutter version
         run: flutter --version
+
       - name: Decode google-services.json
         run: |
           cat > android/app/google-services.json << 'EOF'
           ${{ secrets.GOOGLE_SERVICES_JSON }}
           EOF
 
+      - name: Validate google-services.json
+        run: |
+          if ! jq empty android/app/google-services.json 2>/dev/null; then
+            echo "Invalid JSON in google-services.json"
+            cat android/app/google-services.json
+            exit 1
+          fi
+          echo "google-services.json is valid"
 
       - name: Create .env file with secrets
         run: |
@@ -48,6 +57,11 @@ jobs:
 
       - name: Build APK (release)
         run: flutter build apk --release
+
+      - name: Extract APK SHA-1
+        run: |
+          cd android
+          ./gradlew signingReport | grep -A 5 "release"
 
       - name: Rename APK
         run: mv build/app/outputs/flutter-apk/app-release.apk UCBS-Attendance-${{ github.ref_name }}.apk
