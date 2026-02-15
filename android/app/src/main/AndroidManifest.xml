@@ -9,9 +9,9 @@
 
 <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <application
-        android:label="ucbs_attendance_app"
+        android:label="Face Mark Attendance"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
 
         <activity
             android:name=".MainActivity"

@@ -1,15 +1,8 @@
 <div align="center">
 
-# ✨ UCBS ATTENDANCE APP ✨
+<img src="assets/images/logo.png" alt="Face Mark Attendance" width="120" height="120" />
 
-```
-██╗   ██╗ ██████╗██████╗ ███████╗
-██║   ██║██╔════╝██╔══██╗██╔════╝
-██║   ██║██║     ██████╔╝███████╗
-██║   ██║██║     ██╔══██╗╚════██║
-╚██████╔╝╚██████╗██████╔╝███████║
- ╚═════╝  ╚═════╝╚═════╝ ╚══════╝
-```
+# 🎭 FACE MARK ATTENDANCE 🎭
 
 ### ⚡ **FACE RECOGNITION • AI POWERED • REAL-TIME** ⚡
 
@@ -28,7 +21,7 @@
 
 ## ✨ WHAT MAKES THIS SPECIAL?
 
-> **UCBS Attendance App** revolutionizes classroom attendance using cutting-edge AI face recognition technology. Built with Flutter's cross-platform power and Supabase's real-time backend, this isn't just another attendance app—**it's the future of educational technology.**
+> **Face Mark Attendance** revolutionizes classroom attendance using cutting-edge AI face recognition technology. Built with Flutter's cross-platform power and Supabase's real-time backend, this isn't just another attendance app—**it's the future of educational technology.**
 
 <table>
 <tr>
@@ -377,6 +370,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**`[ MADE WITH 🔥 BY MRIDUL SHARMA | © 2025 UCBS ATTENDANCE APP ]`**
+**`[ MADE WITH 🔥 BY MRIDUL SHARMA | © 2025 FACE MARK ATTENDANCE ]`**
 
 </div>

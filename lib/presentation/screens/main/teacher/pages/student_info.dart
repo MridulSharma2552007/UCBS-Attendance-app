@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ucbs_attendance_app/presentation/widgets/common/app_colors.dart';
+import 'package:ucbs_attendance_app/data/services/supabase/Teacher/get_student_attendance.dart';
+import 'package:ucbs_attendance_app/core/services/storage_service.dart';
 
 class StudentInfo extends StatefulWidget {
   final PageController _controller;
@@ -16,6 +18,45 @@ class StudentInfo extends StatefulWidget {
 }
 
 class _StudentInfoState extends State<StudentInfo> {
+  final GetStudentAttendance _attendanceService = GetStudentAttendance();
+  late List<Map<String, dynamic>> subjects = [];
+  late Map<int, Map<String, int>> subjectStats = {};
+  late Map<int, List<Map<String, dynamic>>> subjectAttendance = {};
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final employeeId = StorageService.getInt('employee_id') ?? 0;
+    final rollNo = widget.studentData[0]['roll_no'];
+
+    final fetchedSubjects = await _attendanceService.getTeacherSubjects(
+      employeeId,
+    );
+    setState(() => subjects = fetchedSubjects);
+
+    for (var subject in fetchedSubjects) {
+      final stats = await _attendanceService.getAttendanceStats(
+        rollNo,
+        subject['id'],
+      );
+      final attendance = await _attendanceService.getStudentAttendanceBySubject(
+        rollNo,
+        subject['id'],
+      );
+      setState(() {
+        subjectStats[subject['id']] = stats;
+        subjectAttendance[subject['id']] = attendance;
+      });
+    }
+
+    setState(() => _loading = false);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.studentData.isEmpty) {
@@ -60,7 +101,6 @@ class _StudentInfoState extends State<StudentInfo> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Profile Card
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(24),
@@ -109,94 +149,33 @@ class _StudentInfoState extends State<StudentInfo> {
                 ],
               ),
             ),
-
             const SizedBox(height: 24),
-
-            // Stats Grid
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    'Present',
-                    '42',
-                    Icons.check_circle,
-                    const Color(0xFF00D9A3),
-                  ),
+            if (_loading)
+              const Center(child: CircularProgressIndicator())
+            else ...[
+              Text(
+                'Attendance by Subject',
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatCard(
-                    'Absent',
-                    '8',
-                    Icons.cancel,
-                    const Color(0xFFFF6B6B),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    'Rate',
-                    '84%',
-                    Icons.trending_up,
-                    const Color(0xFFFFD93D),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatCard(
-                    'Total',
-                    '50',
-                    Icons.calendar_today,
-                    const Color(0xFFB794F6),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 28),
-
-            // Subject Performance
-            Text(
-              'Subject Performance',
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
               ),
-            ),
-            const SizedBox(height: 16),
-            _buildSubjectCard('Mathematics', 92, const Color(0xFFCDFF5C)),
-            _buildSubjectCard('Physics', 88, const Color(0xFFFFD93D)),
-            _buildSubjectCard('Chemistry', 76, const Color(0xFFFF8A65)),
-            _buildSubjectCard('English', 95, const Color(0xFF6EC6FF)),
-            _buildSubjectCard('Computer Science', 90, const Color(0xFFDDA0DD)),
-
-            const SizedBox(height: 28),
-
-            // Weekly Overview
-            Text(
-              'This Week',
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildDayCard('M', true),
-                _buildDayCard('T', true),
-                _buildDayCard('W', true),
-                _buildDayCard('T', false),
-                _buildDayCard('F', true),
-              ],
-            ),
+              const SizedBox(height: 16),
+              ...subjects.map((subject) {
+                final stats = subjectStats[subject['id']] ?? {};
+                final attendance = subjectAttendance[subject['id']] ?? [];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSubjectHeader(subject['name'], stats),
+                    const SizedBox(height: 12),
+                    _buildCalendarHeatmap(attendance),
+                    const SizedBox(height: 20),
+                  ],
+                );
+              }).toList(),
+            ],
             const SizedBox(height: 100),
           ],
         ),
@@ -204,53 +183,22 @@ class _StudentInfoState extends State<StudentInfo> {
     );
   }
 
-  Widget _buildStatCard(
-    String title,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: GoogleFonts.inter(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: GoogleFonts.inter(color: Colors.white60, fontSize: 13),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildSubjectHeader(String subject, Map<String, int> stats) {
+    final present = stats['present'] ?? 0;
+    final total = stats['total'] ?? 0;
+    final percentage = stats['percentage'] ?? 0;
 
-  Widget _buildSubjectCard(String subject, int percentage, Color color) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 subject,
@@ -260,24 +208,19 @@ class _StudentInfoState extends State<StudentInfo> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
+              const SizedBox(height: 4),
               Text(
-                '$percentage%',
-                style: GoogleFonts.inter(
-                  color: color,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                ),
+                '$present/$total classes',
+                style: GoogleFonts.inter(color: Colors.white60, fontSize: 12),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value: percentage / 100,
-              backgroundColor: Colors.white.withOpacity(0.1),
-              valueColor: AlwaysStoppedAnimation<Color>(color),
-              minHeight: 8,
+          Text(
+            '$percentage%',
+            style: GoogleFonts.inter(
+              color: const Color(0xFF00D9A3),
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],
@@ -285,32 +228,115 @@ class _StudentInfoState extends State<StudentInfo> {
     );
   }
 
-  Widget _buildDayCard(String day, bool present) {
+  Widget _buildCalendarHeatmap(List<Map<String, dynamic>> attendance) {
+    final now = DateTime.now();
+    final startDate = now.subtract(Duration(days: now.weekday - 1));
+    final weeks = <List<DateTime>>[];
+    final attendanceCount = <String, int>{};
+
+    for (var record in attendance) {
+      final recordDate = DateTime.parse(record['created_at']);
+      final dateKey =
+          '${recordDate.year}-${recordDate.month}-${recordDate.day}';
+      attendanceCount[dateKey] = (attendanceCount[dateKey] ?? 0) + 1;
+    }
+
+    final maxCount = attendanceCount.values.isEmpty
+        ? 1
+        : attendanceCount.values.reduce((a, b) => a > b ? a : b);
+
+    for (int i = 0; i < 12; i++) {
+      final week = <DateTime>[];
+      for (int j = 0; j < 7; j++) {
+        final date = startDate.add(Duration(days: i * 7 + j));
+        if (date.isBefore(now.add(const Duration(days: 1)))) {
+          week.add(date);
+        }
+      }
+      if (week.isNotEmpty) weeks.add(week);
+    }
+
+    Color _getHeatmapColor(int count) {
+      if (count == 0) return Colors.white.withOpacity(0.05);
+      final intensity = count / maxCount;
+      return Color.lerp(
+        const Color(0xFF00D9A3).withOpacity(0.3),
+        const Color(0xFF00D9A3),
+        intensity,
+      )!;
+    }
+
     return Container(
-      width: 60,
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.white.withOpacity(0.03),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            day,
-            style: GoogleFonts.inter(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
+          Row(
+            children: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                .map(
+                  (day) => Expanded(
+                    child: Text(
+                      day,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        color: Colors.white54,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
           ),
           const SizedBox(height: 8),
-          Icon(
-            present ? Icons.check_circle : Icons.cancel,
-            color: present ? const Color(0xFF00D9A3) : const Color(0xFFFF6B6B),
-            size: 24,
-          ),
+          ...weeks.map((week) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                children:
+                    (week
+                            .map((date) {
+                              final dateKey =
+                                  '${date.year}-${date.month}-${date.day}';
+                              final count = attendanceCount[dateKey] ?? 0;
+
+                              return Expanded(
+                                child: Tooltip(
+                                  message: count > 0
+                                      ? '${date.day}/${date.month} - $count class(es)'
+                                      : '${date.day}/${date.month} - Absent',
+                                  child: Container(
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: _getHeatmapColor(count),
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.1),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            })
+                            .toList()
+                            .expand(
+                              (widget) => [widget, const SizedBox(width: 2)],
+                            )
+                            .toList()
+                            .dropLast(1)
+                        as List<Widget>),
+              ),
+            );
+          }).toList(),
         ],
       ),
     );
   }
+}
+
+extension on List {
+  List dropLast(int n) => sublist(0, length - n);
 }
