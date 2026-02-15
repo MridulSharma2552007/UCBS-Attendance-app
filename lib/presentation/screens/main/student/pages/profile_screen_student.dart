@@ -516,80 +516,95 @@ Widget _buildProfileHeader(BuildContext context) {
         ),
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-          child: Column(
+          child: Stack(
             children: [
-              IconButton(
-                onPressed: () => AuthService.signOut(context),
-                icon: Icon(Icons.logout_rounded),
-                color: Colors.white,
-                iconSize: 30,
-              ),
-              Container(
-                height: 140,
-                width: 140,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 4),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 15,
-                      offset: Offset(0, 5),
-                    ),
-                  ],
-                  image: photoUrl != null
-                      ? DecorationImage(
-                          image: NetworkImage(photoUrl),
-                          fit: BoxFit.cover,
-                        )
-                      : null,
-                  color: Colors.white.withOpacity(0.3),
-                ),
-                child: photoUrl == null
-                    ? Icon(Icons.person, size: 70, color: Colors.white)
-                    : null,
-              ),
-              SizedBox(height: 20),
-              Text(
-                name,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+              Positioned(
+                top: 0,
+                right: 0,
+                child: IconButton(
+                  onPressed: () => AuthService.signOut(context),
+                  icon: Icon(Icons.logout_rounded),
                   color: Colors.white,
+                  iconSize: 30,
                 ),
               ),
-              SizedBox(height: 8),
-              Text(
-                email,
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  color: Colors.white.withOpacity(0.9),
-                ),
-              ),
-              SizedBox(height: 8),
-              GestureDetector(
-                onTap: () => _showSemesterChangeDialog(context, email),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Semester: $sem',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 140,
+                      width: 140,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 4),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 15,
+                            offset: Offset(0, 5),
+                          ),
+                        ],
+                        image: photoUrl != null
+                            ? DecorationImage(
+                                image: NetworkImage(photoUrl),
+                                fit: BoxFit.cover,
+                              )
+                            : null,
+                        color: Colors.white.withOpacity(0.3),
+                      ),
+                      child: photoUrl == null
+                          ? Icon(Icons.person, size: 70, color: Colors.white)
+                          : null,
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      name,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      email,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: () => _showSemesterChangeDialog(context, email),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Semester: $sem',
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Icon(Icons.edit, size: 14, color: Colors.white),
+                          ],
                         ),
                       ),
-                      SizedBox(width: 8),
-                      Icon(Icons.edit, size: 14, color: Colors.white),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ],

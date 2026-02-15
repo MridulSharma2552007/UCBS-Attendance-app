@@ -232,10 +232,7 @@ class _StudentScanState extends State<StudentScan> {
     }
   }
 
-  Future<void> _processDetection(
-    List<double> faceVector,
-    double conf,
-  ) async {
+  Future<void> _processDetection(List<double> faceVector, double conf) async {
     final rollNo = StorageService.getString('roll_no');
     if (rollNo == null || rollNo.isEmpty) {
       if (mounted) {
@@ -419,12 +416,7 @@ class _StudentScanState extends State<StudentScan> {
             )
           else if (!kIsWeb && _controller != null)
             Positioned.fill(child: CameraPreview(_controller!)),
-          Positioned(
-            top: 40,
-            left: 20,
-            right: 20,
-            child: InstructionCard(),
-          ),
+          Positioned(top: 40, left: 20, right: 20, child: InstructionCard()),
           if (personConfidence != null)
             Positioned(
               bottom: 140,
@@ -437,38 +429,36 @@ class _StudentScanState extends State<StudentScan> {
             ),
           Positioned(
             bottom: 40,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: GestureDetector(
-                onTap: () async {
-                  HapticFeedback.mediumImpact();
+            right: 20,
+            child: GestureDetector(
+              onTap: () async {
+                HapticFeedback.mediumImpact();
 
-                  if (kIsWeb && _webCameraReady) {
-                    await _captureWebImage();
-                  } else if (_controller?.value.isInitialized == true) {
-                    final file = await _controller!.takePicture();
-                    await _sendImage(file.path);
-                  }
-                },
+                if (kIsWeb && _webCameraReady) {
+                  await _captureWebImage();
+                } else if (_controller?.value.isInitialized == true) {
+                  final file = await _controller!.takePicture();
+                  await _sendImage(file.path);
+                }
+              },
+              child: Container(
+                height: 80,
+                width: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 4),
+                ),
                 child: Container(
-                  height: 80,
-                  width: 80,
-                  decoration: BoxDecoration(
+                  margin: const EdgeInsets.all(6),
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 4),
-                  ),
-                  child: Container(
-                    margin: const EdgeInsets.all(6),
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
+                    color: Colors.white,
                   ),
                 ),
               ),
             ),
           ),
+
           if (_uploading)
             const Center(child: CircularProgressIndicator(color: Colors.white)),
         ],
