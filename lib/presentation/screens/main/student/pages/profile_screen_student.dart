@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:ucbs_attendance_app/core/services/auth_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:ucbs_attendance_app/core/services/storage_service.dart';
@@ -14,7 +15,7 @@ class ProfileScreenStudent extends StatefulWidget {
   const ProfileScreenStudent({super.key});
 
   @override
-   State<ProfileScreenStudent> createState() => _ProfileScreenStudentState();
+  State<ProfileScreenStudent> createState() => _ProfileScreenStudentState();
 }
 
 class _ProfileScreenStudentState extends State<ProfileScreenStudent> {
@@ -517,6 +518,12 @@ Widget _buildProfileHeader(BuildContext context) {
           padding: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
           child: Column(
             children: [
+              IconButton(
+                onPressed: () => AuthService.signOut(context),
+                icon: Icon(Icons.logout_rounded),
+                color: Colors.white,
+                iconSize: 30,
+              ),
               Container(
                 height: 140,
                 width: 140,
